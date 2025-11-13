@@ -15,12 +15,11 @@ class Area(models.Model):
 class Tower(models.Model):
     name=models.CharField(max_length=200)
     difficulty = models.FloatField()
-    creators = ArrayField(models.CharField(max_length=100), default=list)
+    creators_m2m = models.ManyToManyField('Creator', related_name='towers', blank=True)
     floors = models.IntegerField()
     area = models.ForeignKey(Area, on_delete=models.SET_NULL, null=True)
-    score = models.IntegerField(validators=[MinValueValidator(0), MaxValueValidator(100)])
+    score = models.IntegerField(validators=[MinValueValidator(0), MaxValueValidator(100)], db_index=True)
     type = models.CharField(
-        max_length=50,
         choices=[
             ('tower', 'Tower'),
             ('mini_tower', 'Mini-Tower'),
@@ -29,5 +28,26 @@ class Tower(models.Model):
         ],
         default='tower'
     )
+    diff_category = models.CharField(
+        default='easy',
+        choices=[
+            ('easy', 'Easy'),
+            ('medium', 'Medium'),
+            ('hard', 'Hard'),
+            ('difficult', 'Difficult'),
+            ('challenging', 'Challenging'),
+            ('intense', 'Intense'),
+            ('remorseless', 'Remorseless'),
+            ('insane', 'Insane'),
+            ('extreme', 'Extreme'),
+            ('terrifying', 'Terrifying'),
+            ('catastrophic', 'Catastrophic'),
+        ]
+    )
 
+class Creator(models.Model):
+    name = models.CharField(max_length=100, unique=True)
+
+    def __str__(self):
+        return self.name
 
