@@ -1,6 +1,3 @@
-"""
-Custom Roblox OAuth implementation
-"""
 import requests
 from django.conf import settings
 from django.contrib.auth import get_user_model
@@ -10,6 +7,7 @@ from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
 import secrets
+from .models import Profile  # Add this import
 
 User = get_user_model()
 
@@ -54,13 +52,11 @@ def roblox_callback(request):
     if not state or state != stored_state:
         return Response({'error': 'Invalid state parameter'}, status=400)
     
-    # Get authorization code
     code = request.GET.get('code')
     if not code:
         return Response({'error': 'No authorization code provided'}, status=400)
     
     try:
-        # Exchange code for access token
         token_data = {
             'client_id': settings.ROBLOX_CLIENT_ID,
             'client_secret': settings.ROBLOX_CLIENT_SECRET,
@@ -77,7 +73,6 @@ def roblox_callback(request):
         if not access_token:
             return Response({'error': 'No access token received'}, status=400)
         
-        # Fetch user info from Roblox
         headers = {'Authorization': f'Bearer {access_token}'}
         user_response = requests.get(ROBLOX_USERINFO_URL, headers=headers)
         user_response.raise_for_status()
@@ -85,7 +80,6 @@ def roblox_callback(request):
         
         print("DEBUG: Roblox user data:", roblox_user)
         
-        # Create or get Django user
         roblox_id = roblox_user.get('sub')
         username = roblox_user.get('preferred_username', f'roblox_{roblox_id}')
         
@@ -96,10 +90,21 @@ def roblox_callback(request):
             }
         )
         
-        # Generate JWT tokens
+        # Get or create Profile for this user
+        profile, profile_created = Profile.objects.get_or_create(
+            user=user,
+            defaults={
+                'roblox_user_id': roblox_id
+            }
+        )
+        
+        # Update Roblox user ID if it changed
+        if not profile_created and profile.roblox_user_id != roblox_id:
+            profile.roblox_user_id = roblox_id
+            profile.save()
+        
         tokens = get_tokens_for_user(user)
         
-        # Redirect to frontend with tokens
         frontend_url = settings.FRONTEND_URL
         redirect_url = f"{frontend_url}/auth/callback?access={tokens['access']}&refresh={tokens['refresh']}"
         

@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Tower, Area, Creator
+from .models import Tower, Area, Creator, Profile, Badge
 from django.db.models import Count
 
 @admin.register(Area)
@@ -12,7 +12,7 @@ class AreaAdmin(admin.ModelAdmin):
 class TowerAdmin(admin.ModelAdmin):
     list_display = ('name', 'difficulty', 'area', 'type', 'score', 'diff_category', 'display_creators')
     list_filter = ('area', 'type', 'diff_category')
-    search_fields = ('name', 'creators')
+    search_fields = ('name',)
     list_editable = ('type', 'score')
     ordering = ('name',)
 
@@ -36,3 +36,15 @@ class CreatorAdmin(admin.ModelAdmin):
     def display_towers(self, obj):
         return ", ".join([t.name for t in obj.towers.all()])
     display_towers.short_description = 'Towers'
+
+@admin.register(Profile)
+class ProfileAdmin(admin.ModelAdmin):
+    list_display = ('user', 'roblox_user_id', 'display_completed_towers')
+    
+    def display_completed_towers(self, obj):
+        return ", ".join([tower.name for tower in obj.complete_towers.all()])
+    display_completed_towers.short_description = 'Completed Towers'
+
+@admin.register(Badge)
+class BadgeAdmin(admin.ModelAdmin):
+    display = ('id')

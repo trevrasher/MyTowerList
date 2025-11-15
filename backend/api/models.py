@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.postgres.fields import ArrayField
 from django.core.validators import MaxValueValidator, MinValueValidator
+from django.contrib.auth.models import User
 
 class Area(models.Model):
     name = models.CharField(max_length=100, unique=True)
@@ -44,10 +45,25 @@ class Tower(models.Model):
             ('catastrophic', 'Catastrophic'),
         ]
     )
+    badge = models.ForeignKey('Badge', on_delete=models.SET_NULL, null=True, blank=True, related_name='tower')
 
 class Creator(models.Model):
     name = models.CharField(max_length=100, unique=True)
+    
 
     def __str__(self):
         return self.name
 
+class Badge(models.Model):
+    id = models.BigIntegerField(unique= True, primary_key = True)
+    name = models.CharField(max_length = 100, null = True)
+
+
+class Profile(models.Model):
+    complete_towers = models.ManyToManyField('Tower', blank = True)
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile', null=True)
+    roblox_user_id = models.BigIntegerField(unique=True, null=True, blank=True)
+
+    def __str__(self):
+        return f"{self.user.username}'s Profile"
+    
