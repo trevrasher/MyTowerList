@@ -18,7 +18,7 @@ export default function SyncButton() {
     setMessage('Syncing...');
 
     try {
-      const response = await fetch(`${API_BASE_URL}/api/profile/sync-completions/`, {
+      const response = await fetch(`${API_BASE_URL}/api/sync-completions/`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
