@@ -4,6 +4,7 @@ import DifficultyFilter from "./components/difficultyFilter";
 import AreaFilter from "./components/areaFilter";
 import CompletedFilter from "./components/completedFilter";
 import LoginButton from "./components/loginButton";
+import SyncButton from "./components/syncCompletions";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8000";
 
@@ -118,6 +119,7 @@ export default function Home() {
         {showFilters ? 'Hide Filters' : 'Show Filters'}
       </button>
       <LoginButton/>
+      <SyncButton/>
       <div>
         {showFilters && (
           <div>
