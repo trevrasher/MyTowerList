@@ -12,13 +12,13 @@ import csv
 etohUniverseID = 3264581003
 
 class GetTowerByName(generics.RetrieveAPIView):
-    queryset = Tower.objects.all()
+    queryset = Tower.objects.select_related('area', 'badge').prefetch_related('creators_m2m').all()
     serializer_class = TowerSerializer
     lookup_field = 'name'
     
 
 class GetAllTowersByScore(generics.ListAPIView):
-    queryset = Tower.objects.all().order_by('-score')
+    queryset = Tower.objects.select_related('area', 'badge').prefetch_related('creators_m2m').all().order_by('-score')
     serializer_class = TowerSerializer
 
 
@@ -47,6 +47,7 @@ class GetUserBadges(APIView):
                 {'error': str(e)}, 
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
+
 class GetGameBadgesCSV(APIView):
     def get(self, request):
         all_badges = []
@@ -93,7 +94,5 @@ class GetCompletedTowers(APIView):
 
     def get (self, request):
         profile = request.user.profile
-        completed_towers = profile.complete_towers.all().values('id')
+        completed_towers = profile.complete_towers.select_related('area', 'badge').prefetch_related('creators_m2m').all().values('id')
         return Response(list(completed_towers))
-
-
