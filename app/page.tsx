@@ -5,7 +5,7 @@ import AreaFilter from "./components/areaFilter";
 import CompletedFilter from "./components/completedFilter";
 import LoginButton from "./components/loginButton";
 
-const API_BASE_URL = "http://localhost:8000";
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8000";
 
 type Tower = {
   id: number;
