@@ -34,7 +34,7 @@ export default function Home() {
   const [selectedAreas, setSelectedAreas] = useState<string[]>(areas);
   const [completedToggle, setCompletedToggle] = useState<boolean>(false);
   const [difficultyRange, setDifficultyRange] = useState<number[]>([1, 12]);
-  const [completedTowers, setCompletedTowers] = useState<Tower[]>([]);
+  const [completedTowers, setCompletedTowers] = useState<number[]>([]);
   const [showFilters, setShowFilters] = useState<boolean>(false);
 
 
@@ -65,17 +65,15 @@ export default function Home() {
       tower.difficulty >= difficultyRange[0] && tower.difficulty <= difficultyRange[1]
     );
 
-    const completedTowerIds = completedTowers.map(t => t.id);
-    if(completedToggle) {
+    if (completedToggle) {
       filtered = filtered.filter(tower => 
-        !completedTowerIds.includes(tower.id)
-        
+        !completedTowers.includes(tower.id)
       );
     }
 
     setFilteredTowers(filtered);
 
-  }, [selectedDifficulty, selectedAreas, towers, difficultyRange, completedToggle])
+  }, [selectedDifficulty, selectedAreas, towers, difficultyRange, completedToggle, completedTowers])
 
   useEffect(() => {
     const token = localStorage.getItem('access_token');
@@ -91,8 +89,12 @@ export default function Home() {
           if (!res.ok) throw new Error('Failed to fetch');
           return res.json();
         })
-        .then((data) => setCompletedTowers(data))
-        .catch((error) => console.error('Error fetching completed towers:', error));
+        .then((data) => {
+          const ids = data.map((item: any) => item.id);
+          console.log('Completed tower IDs:', ids);
+          setCompletedTowers(ids);
+        })
+        .catch((error) => console.error('Error:', error));
     }
   }, []);
 
@@ -138,7 +140,7 @@ export default function Home() {
 
       <div className="grid grid-cols-6 gap-2.5 p-5">
         {filteredTowers.map((tower) => {
-          const isCompleted = completedTowers.some(ct => ct.id === tower.id);
+          const isCompleted = completedTowers.includes(tower.id);
           
           return (
             <div 
