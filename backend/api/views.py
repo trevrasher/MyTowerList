@@ -71,8 +71,29 @@ class GetGameBadgesCSV(APIView):
                 writer.writerow([badge['id'], badge['name']])
 
         print(f'Saved {len(all_badges)} badges to badges.csv')
-            
-                    
+
+class SyncTowerCompletions(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        profile = request.user.profile
+        result = profile.sync_tower_completions()
+
+        if 'error' in result:
+            return Response(result, status=status.HTTP_400_BAD_REQUEST)
         
+        return Response({
+            'message': f"Synced {result['newly_completed_count']} new completions",
+            'newly_completed': result['newly_completed'],
+            'total_checked': result['total_checked']
+        })
+            
+class GetCompletedTowers(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get (self, request):
+        profile = request.user.profile
+        completed_towers = profile.complete_towers.all().values('id')
+        return Response(list(completed_towers))
 
 

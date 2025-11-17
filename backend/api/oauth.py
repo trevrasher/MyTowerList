@@ -106,7 +106,7 @@ def roblox_callback(request):
         tokens = get_tokens_for_user(user)
         
         frontend_url = settings.FRONTEND_URL
-        redirect_url = f"{frontend_url}/auth/callback?access={tokens['access']}&refresh={tokens['refresh']}"
+        redirect_url = f"{frontend_url}/?access={tokens['access']}&refresh={tokens['refresh']}"
         
         return redirect(redirect_url)
         

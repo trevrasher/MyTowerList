@@ -4,8 +4,12 @@ from django.db.models import Count
 
 @admin.register(Area)
 class AreaAdmin(admin.ModelAdmin):
-    list_display = ('name', 'order')
-    list_editable = ('order',)
+    list_display = ('name', 'order', 'required_completions', 'required_medium', 'required_hard', 
+                      'required_difficult', 'required_challenging', 'required_intense',
+                      'required_remorseless')
+    list_editable = ('required_completions', 'required_medium', 'required_hard', 
+                      'required_difficult', 'required_challenging', 'required_intense',
+                      'required_remorseless' )
     ordering = ('order', 'name')
 
 @admin.register(Tower)
@@ -42,8 +46,16 @@ class ProfileAdmin(admin.ModelAdmin):
     list_display = ('user', 'roblox_user_id', 'display_completed_towers')
     
     def display_completed_towers(self, obj):
-        return ", ".join([tower.name for tower in obj.complete_towers.all()])
+        return obj.complete_towers.count()
     display_completed_towers.short_description = 'Completed Towers'
+
+    def completion_by_difficulty(self, obj):
+        stats = obj.complete_towers.values('diff_category').annotate(count=Count('id')).order_by('diff_category')
+        
+        if not stats:
+            return "No completions yet"
+        return " | ".join([f"{s['diff_category'].title()}: {s['count']}" for s in stats])
+    completion_by_difficulty.short_description = 'Completions by Difficulty'
 
 @admin.register(Badge)
 class BadgeAdmin(admin.ModelAdmin):
