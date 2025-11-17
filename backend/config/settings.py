@@ -161,5 +161,5 @@ SIMPLE_JWT = {
 # Roblox OAuth Settings
 ROBLOX_CLIENT_ID = os.getenv('ROBLOX_CLIENT_ID', 'default_id')
 ROBLOX_CLIENT_SECRET = os.getenv('ROBLOX_CLIENT_SECRET', 'default_secret')
-ROBLOX_REDIRECT_URI = 'http://localhost:8000/api/auth/roblox/callback/'
-FRONTEND_URL = 'http://localhost:3000'
+ROBLOX_REDIRECT_URI = os.getenv('ROBLOX_REDIRECT_URI', 'http://localhost:8000/api/auth/roblox/callback/')
+FRONTEND_URL = 'my-tower-list.vercel.app'
