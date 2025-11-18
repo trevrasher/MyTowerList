@@ -41,12 +41,20 @@ export default function Home() {
 
 
   useEffect(() => {
-    fetch(`${API_BASE_URL}/api/towers/`)
-    .then((res) => res.json())
-    .then((data) => {
-      setTowers(data);
-      setFilteredTowers(data);
-    });
+    const cached = localStorage.getItem('towers');
+    if (cached) {
+      const towersData = JSON.parse(cached);
+      setTowers(towersData);
+      setFilteredTowers(towersData);
+    } else {
+      fetch(`${API_BASE_URL}/api/towers/`)
+        .then((res) => res.json())
+        .then((data) => {
+          setTowers(data);
+          setFilteredTowers(data);
+          localStorage.setItem('towers', JSON.stringify(data));
+        });
+    }
   }, []);
 
   useEffect(() => {
