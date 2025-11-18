@@ -56,6 +56,7 @@ export default function Home() {
     
     if (access && refresh) {
       localStorage.setItem('access_token', access);
+      window.dispatchEvent(new Event('storage'));
       localStorage.setItem('refresh_token', refresh);
       setIsAuthenticated(true);
       

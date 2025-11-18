@@ -5,10 +5,18 @@ const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8
 
 export default function LoginButton() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  
 
-  useEffect(() => {
-    const token = localStorage.getItem('access_token');
-    setIsLoggedIn(!!token);
+   useEffect(() => {
+    const checkToken = () => {
+      const token = localStorage.getItem('access_token');
+      setIsLoggedIn(!!token);
+    };
+
+    checkToken(); 
+
+    window.addEventListener('storage', checkToken);
+    return () => window.removeEventListener('storage', checkToken);
   }, []);
 
   const handleLogin = () => {
