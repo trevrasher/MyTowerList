@@ -100,6 +100,7 @@ export default function Home() {
             const ids = data.map((item: any) => item.id);
             console.log('Completed tower IDs:', ids);
             setCompletedTowers(ids);
+            localStorage.setItem('completedTowers', JSON.stringify(data));
           })
           .catch((error) => console.error('Error:', error));
       }
