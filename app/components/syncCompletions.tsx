@@ -30,7 +30,6 @@ export default function SyncButton() {
       
       if (response.ok) {
         setMessage(`Synced ${data.newly_completed_count} new towers!`);
-        // Reload the page to show updated completions
         window.location.reload();
       } else {
         setMessage(`Error: ${data.error || 'Failed to sync'}`);
