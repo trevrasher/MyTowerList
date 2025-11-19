@@ -32,8 +32,6 @@ ALLOWED_HOSTS = [
     '.vercel.app', 
 ]
 
-# Add this setting:
-ALLOWED_REDIRECT_HOSTS = ['localhost']
 
 
 
@@ -142,6 +140,8 @@ CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",  
     "https://my-tower-list.vercel.app",
 ]
+
+CORS_ALLOW_CREDENTIALS = True
 
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
