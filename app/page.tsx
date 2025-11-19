@@ -33,19 +33,41 @@ export default function Home() {
   const [towers, setTowers] = useState<Tower[]>([]);
   const [filteredTowers, setFilteredTowers] = useState<Tower[]>([]);
   const [completedTowers, setCompletedTowers] = useState<number[]>([]);
-  const [selectedAreas, setSelectedAreas] = useState<string[]>(
-    () => JSON.parse(sessionStorage.getItem('selectedAreas') || JSON.stringify(areas))
-  );
-  const [completedToggle, setCompletedToggle] = useState<boolean>(
-    () => JSON.parse(sessionStorage.getItem('completedToggle') || 'false')
-  );
-  const [difficultyRange, setDifficultyRange] = useState<number[]>(
-    () => JSON.parse(sessionStorage.getItem('difficultyRange') || '[1,12]')
-  );
-  const [showFilters, setShowFilters] = useState<boolean>(
-    () => JSON.parse(sessionStorage.getItem('showFilters') || 'false')
-  );
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
+  const [selectedAreas, setSelectedAreas] = useState<string[]>(areas);
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const stored = sessionStorage.getItem('selectedAreas');
+      if (stored) setSelectedAreas(JSON.parse(stored));
+    }
+  }, []);
+
+  const [completedToggle, setCompletedToggle] = useState<boolean>(false);
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const stored = sessionStorage.getItem('completedToggle');
+      if (stored) setCompletedToggle(JSON.parse(stored));
+    }
+  }, []);
+
+  const [difficultyRange, setDifficultyRange] = useState<number[]>([1, 12]);
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const stored = sessionStorage.getItem('difficultyRange');
+      if (stored) setDifficultyRange(JSON.parse(stored));
+    }
+  }, []);
+
+  const [showFilters, setShowFilters] = useState<boolean>(false);
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const stored = sessionStorage.getItem('showFilters');
+      if (stored) setShowFilters(JSON.parse(stored));
+    }
+  }, []);
+
+
 
   useEffect(() => {
   sessionStorage.setItem('selectedAreas', JSON.stringify(selectedAreas));
