@@ -1,6 +1,8 @@
+type Props = {
+  setSelectedAreas: (values: string[]) => void;
+};
 
-
-export default function AutoAreaFilterButton(setSelectedAreas: (values: string[]) => void) {
+export default function AutoAreaFilterButton({ setSelectedAreas }: Props) {
 
     const handleClick = async () => {
         const res = await fetch('api/profile/available-areas');
