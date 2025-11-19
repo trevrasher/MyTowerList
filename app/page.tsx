@@ -5,6 +5,7 @@ import AreaFilter from "./components/areaFilter";
 import CompletedFilter from "./components/completedFilter";
 import LoginButton from "./components/loginButton";
 import SyncButton from "./components/syncCompletions";
+import AutoAreaFilterButton from "./components/autoAreaFilterButton";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8000";
 
@@ -149,6 +150,9 @@ export default function Home() {
       <div>
         {showFilters && (
           <div>
+            <AutoAreaFilterButton
+            setSelectedAreas={setSelectedAreas}
+            />
             <DifficultyFilter 
               difficultyRange={difficultyRange}
               setDifficultyRange={setDifficultyRange}
