@@ -10,5 +10,5 @@ urlpatterns = [
     path('badges/csv/', GetGameBadgesCSV.as_view(), name='game-badges-csv'),
     path('sync-completions/', SyncTowerCompletions.as_view(), name='sync-completions'),
     path('profile/completed-towers/', GetCompletedTowers.as_view(), name='get-completed'),
-    path('profile/available-areas', GetEligibleAreas.as_view(), name = 'get-avail')
+    path('profile/available-areas/', GetEligibleAreas.as_view(), name = 'get-avail')
 ]
