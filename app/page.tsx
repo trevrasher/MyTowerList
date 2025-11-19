@@ -78,13 +78,13 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
-    if (!isAuthenticated) return;
     const cached = localStorage.getItem('completedTowers');
     if (cached) {
       const data = JSON.parse(cached);
       const ids = data.map((item: any) => item.id);
       setCompletedTowers(ids);
     } else {
+      if (!isAuthenticated) return;
       const token = localStorage.getItem('access_token');
       if (token) {
         fetch(`${API_BASE_URL}/api/profile/completed-towers/`, {
