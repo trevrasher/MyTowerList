@@ -5,7 +5,12 @@ type Props = {
 export default function AutoAreaFilterButton({ setSelectedAreas }: Props) {
 
     const handleClick = async () => {
-        const res = await fetch('api/profile/available-areas');
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/profile/available-areas`, {
+            credentials: 'include', 
+            headers: {
+            'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
+            'Content-Type': 'application/json'
+        }});
         const data = await res.json();
         setSelectedAreas(data);
         

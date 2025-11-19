@@ -121,5 +121,5 @@ class GetEligibleAreas(APIView):
             )
             if eligible:
                 data.append({
-                    "name": area.name})
+                    area.name})
         return Response(data)
