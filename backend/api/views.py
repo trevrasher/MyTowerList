@@ -124,6 +124,5 @@ class GetEligibleAreas(APIView):
                 diff_counts.get('remorseless', 0) >= area.required_remorseless
             )
             if eligible:
-                data.append({
-                    area.name})
+                data.append(area.name)
         return Response(data)
