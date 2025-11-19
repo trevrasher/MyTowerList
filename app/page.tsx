@@ -32,13 +32,36 @@ const areas = [
 export default function Home() {
   const [towers, setTowers] = useState<Tower[]>([]);
   const [filteredTowers, setFilteredTowers] = useState<Tower[]>([]);
-  const [selectedDifficulty, setSelectedDifficulty] = useState<string[]>([]);
-  const [selectedAreas, setSelectedAreas] = useState<string[]>(areas);
-  const [completedToggle, setCompletedToggle] = useState<boolean>(false);
-  const [difficultyRange, setDifficultyRange] = useState<number[]>([1, 12]);
   const [completedTowers, setCompletedTowers] = useState<number[]>([]);
-  const [showFilters, setShowFilters] = useState<boolean>(false);
+  const [selectedAreas, setSelectedAreas] = useState<string[]>(
+    () => JSON.parse(sessionStorage.getItem('selectedAreas') || JSON.stringify(areas))
+  );
+  const [completedToggle, setCompletedToggle] = useState<boolean>(
+    () => JSON.parse(sessionStorage.getItem('completedToggle') || 'false')
+  );
+  const [difficultyRange, setDifficultyRange] = useState<number[]>(
+    () => JSON.parse(sessionStorage.getItem('difficultyRange') || '[1,12]')
+  );
+  const [showFilters, setShowFilters] = useState<boolean>(
+    () => JSON.parse(sessionStorage.getItem('showFilters') || 'false')
+  );
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
+
+  useEffect(() => {
+  sessionStorage.setItem('selectedAreas', JSON.stringify(selectedAreas));
+  }, [selectedAreas]);
+
+  useEffect(() => {
+    sessionStorage.setItem('completedToggle', JSON.stringify(completedToggle));
+  }, [completedToggle]);
+
+  useEffect(() => {
+    sessionStorage.setItem('difficultyRange', JSON.stringify(difficultyRange));
+  }, [difficultyRange]);
+
+  useEffect(() => {
+    sessionStorage.setItem('showFilters', JSON.stringify(showFilters));
+  }, [showFilters]);
 
 
   useEffect(() => {
@@ -111,11 +134,6 @@ export default function Home() {
 
   useEffect(() =>  {
     let filtered = towers
-    if(selectedDifficulty.length > 0) {
-      filtered = filtered.filter(tower =>
-        selectedDifficulty.includes(tower.diff_category)
-      );
-    }
 
     if(selectedAreas.length>0) {
       filtered = filtered.filter(tower =>
@@ -135,7 +153,7 @@ export default function Home() {
 
     setFilteredTowers(filtered);
 
-  }, [selectedDifficulty, selectedAreas, towers, difficultyRange, completedToggle, completedTowers])
+  }, [selectedAreas, towers, difficultyRange, completedToggle, completedTowers])
 
 
 
