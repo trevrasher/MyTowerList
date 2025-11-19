@@ -39,7 +39,7 @@ export default function DifficultyFilter({ difficultyRange, setDifficultyRange }
               <div
                 key={key}
                 {...restProps}
-                className="h-1.5 w-full rounded"
+                className="h-3 w-1/1 rounded border border-black border-2"
                 style={{
                   background: `linear-gradient(to right, ${
                     [...Array(11)].map((_, i) => {
