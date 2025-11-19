@@ -44,8 +44,10 @@ return (
               <div
                 key={key}
                 {...restProps}
-                // ...existing code...
-              />
+                className="h-5 w-5 bg-blue-500 rounded-full shadow flex items-center justify-center"
+              >
+                <span className="text-xs text-white">{difficultyRange[index].toFixed(1)}</span>
+              </div>
             );
           }}
         />
