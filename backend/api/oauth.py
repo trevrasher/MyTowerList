@@ -7,7 +7,7 @@ from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
 import secrets
-from .models import Profile  # Add this import
+from .models import Profile 
 
 User = get_user_model()
 

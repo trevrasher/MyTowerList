@@ -82,7 +82,8 @@ export default function Home() {
     const cached = localStorage.getItem('completedTowers');
     if (cached) {
       const data = JSON.parse(cached);
-      setCompletedTowers(data);
+      const ids = data.map((item: any) => item.id);
+      setCompletedTowers(ids);
     } else {
       const token = localStorage.getItem('access_token');
       if (token) {
