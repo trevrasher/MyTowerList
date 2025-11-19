@@ -109,6 +109,10 @@ class GetEligibleAreas(APIView):
             diff_counts[cat] = diff_counts.get(cat, 0) + 1
 
         data = []
+        print("User:", request.user)
+        print("Completed towers:", profile.complete_towers.count())
+        print("Areas:", areas.count())
+        print("Diff counts:", diff_counts)
         for area in areas:
             eligible = (
                 completed.count() >= area.required_completions and
