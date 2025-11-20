@@ -35,7 +35,6 @@ export default function Home() {
   const [completedTowers, setCompletedTowers] = useState<number[]>([]);
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   const [selectedAreas, setSelectedAreas] = useState<string[]>(areas);
-
   useEffect(() => {
     if (typeof window !== "undefined") {
       const stored = sessionStorage.getItem('selectedAreas');
