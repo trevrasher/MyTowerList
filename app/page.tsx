@@ -6,6 +6,7 @@ import CompletedFilter from "./components/completedFilter";
 import LoginButton from "./components/loginButton";
 import SyncButton from "./components/syncCompletions";
 import AutoAreaFilterButton from "./components/autoAreaFilterButton";
+import MainHeader from "./components/mainHeader";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8000";
 
@@ -181,10 +182,10 @@ export default function Home() {
 
   return (
     <>
+      <MainHeader/>
       <button onClick={() => setShowFilters(!showFilters)} className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-700">
         {showFilters ? 'Hide Filters' : 'Show Filters'}
       </button>
-      <LoginButton/>
       <SyncButton/>
       <div>
         {showFilters && (
