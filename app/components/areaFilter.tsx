@@ -39,6 +39,7 @@ export default function AreaFilter({areas, setSelectedAreas, selectedAreas}: Are
     {Object.entries(groupedAreas).map(([group, groupAreas]) => (
         <div key={group} className="mb-4 text-xl">
         <label className="font-bold mb-2 cursor-pointer" onClick={() => worldToggle(group)}>{group}</label>
+        <div className="grid grid-cols-2 gap-x-3">
         {groupAreas.map((area) => (
             <label key={area} className="flex items-center space-x-2 cursor-pointer">
             <input
@@ -50,6 +51,7 @@ export default function AreaFilter({areas, setSelectedAreas, selectedAreas}: Are
             <span className="text-sm">{area}</span>
             </label>
         ))}
+        </div>
         </div>
     ))}
     </div>
