@@ -22,7 +22,7 @@ const SEGMENTS: string[] = [
 
 export default function DifficultyFilter({ difficultyRange, setDifficultyRange }: DifficultyFilterProps) {
   return (
-    <div className="p-5 bg-zinc-900 rounded-lg mb-5">
+    <div className="p-5 bg-zinc-900 rounded-lg mb-5 w-1/3">
       <div className="mb-4">
         <div className="block mb-2 font-semibold text-white">
           Difficulty Range: {difficultyRange[0].toFixed(1)} - {difficultyRange[1].toFixed(1)}
@@ -39,7 +39,7 @@ export default function DifficultyFilter({ difficultyRange, setDifficultyRange }
               <div
                 key={key}
                 {...restProps}
-                className="h-3 w-1/1 rounded border border-black border-2"
+                className="h-5 rounded border border-black border-2"
                 style={{
                   background: `linear-gradient(to right, ${
                     [...Array(11)].map((_, i) => {
