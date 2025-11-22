@@ -207,7 +207,7 @@ export default function Home() {
     />
       
       <InfiniteScroll
-        dataLength={Math.min(filteredTowers.length, displayCount)}
+        dataLength={displayCount}
         next={() => setDisplayCount(count => count + 20)}
         hasMore={displayCount < filteredTowers.length}
         loader={<h4>Loading...</h4>}
