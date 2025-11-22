@@ -2,7 +2,7 @@ import { Range, getTrackBackground } from 'react-range';
 
 interface DifficultyFilterProps {
   difficultyRange: number[];
-  setDifficultyRange: (values: number[]) => void;
+  setDifficultyRange: (values: [number, number]) => void;
 }
 
 const SEGMENTS: string[] = [
@@ -22,8 +22,8 @@ const SEGMENTS: string[] = [
 
 export default function DifficultyFilter({ difficultyRange, setDifficultyRange }: DifficultyFilterProps) {
   return (
-    <div className="p-5 bg-zinc-900 rounded-lg mb-5 w-1/3">
-      <div className="mb-4">
+    <div className="p-5 bg-zinc-900 rounded-lg w-1/1">
+      <div>
         <div className="block mb-2 font-semibold text-white">
           Difficulty Range: {difficultyRange[0].toFixed(1)} - {difficultyRange[1].toFixed(1)}
         </div>
@@ -32,7 +32,7 @@ export default function DifficultyFilter({ difficultyRange, setDifficultyRange }
           min={1}
           max={12}
           values={difficultyRange}
-          onChange={(values) => setDifficultyRange(values)}
+          onChange={(values) =>setDifficultyRange([values[0], values[1]])}
           renderTrack={({ props, children }) => {
             const { key, ...restProps } = props as any;
             return (

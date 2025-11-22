@@ -47,7 +47,7 @@ export default function SyncButton() {
       <button 
         onClick={handleSync}
         disabled={syncing}
-        className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-700 disabled:bg-gray-400"
+        className="bg-zinc-600 text-white px-4 py-2 rounded hover:bg-zinc-400 ml-5"
       >
         {syncing ? 'Syncing...' : 'Sync Tower Completions'}
       </button>

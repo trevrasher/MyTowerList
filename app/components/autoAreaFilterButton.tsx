@@ -16,8 +16,8 @@ export default function AutoAreaFilterButton({ setSelectedAreas }: Props) {
     }
 
     return (
-        <button onClick = {handleClick}  className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-700">
-           Sync Areas
+        <button onClick = {handleClick}  className="bg-zinc-600 text-white px-4 py-2 rounded hover:bg-zinc-400">
+           Show Available Areas
         </button>
 
     )

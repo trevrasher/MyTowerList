@@ -1,10 +1,6 @@
 "use client"
 import React, { useEffect, useState } from "react";
-import DifficultyFilter from "./components/difficultyFilter";
-import AreaFilter from "./components/areaFilter";
-import CompletedFilter from "./components/completedFilter";
-import SyncButton from "./components/syncCompletions";
-import AutoAreaFilterButton from "./components/autoAreaFilterButton";
+import FilterBar from "./components/filterBar";
 import MainHeader from "./components/mainHeader";
 import InfiniteScroll from 'react-infinite-scroll-component';
 
@@ -23,7 +19,7 @@ type Tower = {
 };
 
 const areas = [
-  'Ring 0', 'Ring 1', 'Ring 2', 'Ring 3', 'Ring 4', 'Ring 5', 'Ring 6', 'Ring 7', 'Ring 8', 'Ring 9',
+  'Ring 0', 'Ring 1', 'Ring 2',  'Ring 3', 'Ring 4', 'Ring 5', 'Ring 6', 'Ring 7', 'Ring 8', 'Ring 9',
   'Zone 1', 'Zone 2', 'Zone 3', 'Zone 4', 'Zone 5', 'Zone 6', 'Zone 7', 'Zone 8', 'Zone 9', 'Zone 10',
   'Arcane Area', 'Ashen Towerworks', 'Forgotten Ridge', 'Garden of Eeshöl', 'Lost River', 
   'Paradise Atoll', 'Silent Abyss', 'The Starlit Archives'
@@ -65,13 +61,7 @@ export default function Home() {
     }
   }, []);
 
-  const [showFilters, setShowFilters] = useState<boolean>(false);
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      const stored = sessionStorage.getItem('showFilters');
-      if (stored) setShowFilters(JSON.parse(stored));
-    }
-  }, []);
+
 
 
 
@@ -87,9 +77,7 @@ export default function Home() {
     sessionStorage.setItem('difficultyRange', JSON.stringify(difficultyRange));
   }, [difficultyRange]);
 
-  useEffect(() => {
-    sessionStorage.setItem('showFilters', JSON.stringify(showFilters));
-  }, [showFilters]);
+
 
   useEffect(() => {
   setDisplayCount(20);
@@ -99,16 +87,35 @@ export default function Home() {
   useEffect(() => {
     const cached = localStorage.getItem('towers');
     if (cached) {
-      const towersData = JSON.parse(cached);
-      setTowers(towersData);
-      setFilteredTowers(towersData);
+      try {
+        const towersData = JSON.parse(cached);
+        if (Array.isArray(towersData)) {
+          setTowers(towersData);
+          setFilteredTowers(towersData);
+        } else {
+          setTowers([]);
+          setFilteredTowers([]);
+        }
+      } catch {
+        setTowers([]);
+        setFilteredTowers([]);
+      }
     } else {
       fetch(`${API_BASE_URL}/api/towers/`)
         .then((res) => res.json())
         .then((data) => {
-          setTowers(data);
-          setFilteredTowers(data);
-          localStorage.setItem('towers', JSON.stringify(data));
+          if (Array.isArray(data)) {
+            setTowers(data);
+            setFilteredTowers(data);
+            localStorage.setItem('towers', JSON.stringify(data));
+          } else {
+            setTowers([]);
+            setFilteredTowers([]);
+          }
+        })
+        .catch(() => {
+          setTowers([]);
+          setFilteredTowers([]);
         });
     }
   }, []);
@@ -165,7 +172,7 @@ export default function Home() {
   }, [isAuthenticated])
 
   useEffect(() =>  {
-    let filtered = towers
+    let filtered = Array.isArray(towers) ? towers : [];
 
     if(selectedAreas.length>0) {
       filtered = filtered.filter(tower =>
@@ -193,33 +200,16 @@ export default function Home() {
   return (
     <>
       <MainHeader/>
-      <button onClick={() => setShowFilters(!showFilters)} className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-700">
-        {showFilters ? 'Hide Filters' : 'Show Filters'}
-      </button>
-      <SyncButton/>
-      <div>
-        {showFilters && (
-          <div>
-            <AutoAreaFilterButton
-            setSelectedAreas={setSelectedAreas}
-            />
-            <DifficultyFilter 
-              difficultyRange={difficultyRange}
-              setDifficultyRange={setDifficultyRange}
-            />
-            <AreaFilter
-              areas = {areas}
-              selectedAreas={selectedAreas}
-              setSelectedAreas={setSelectedAreas}
-            />
-            <CompletedFilter
-            completedToggle = {completedToggle}
-            setCompletedToggle={setCompletedToggle}/>
-          </div>
-
-        )}
-      </div>
-
+      <FilterBar
+      areas={areas}
+      setSelectedAreas={setSelectedAreas}
+      selectedAreas={selectedAreas}
+      difficultyRange={difficultyRange}
+      setDifficultyRange={setDifficultyRange}
+      completedToggle={completedToggle}
+      setCompletedToggle={setCompletedToggle}
+    />
+      
       <InfiniteScroll
         dataLength={Math.min(filteredTowers.length, displayCount)}
         next={() => setDisplayCount(count => count + 20)}
@@ -235,7 +225,7 @@ export default function Home() {
                 className={`border border-gray-300 p-2.5 rounded-lg ${isCompleted ? 'bg-green-900' : 'bg-black-200'}`}
               >
                 <strong>{tower.name}</strong>
-                <img src={getTowerImageUrl(tower.name)} alt={tower.name}   style={{ height: "180px", width: "100%", objectFit: "cover", display: "block", margin: "0 auto" }} />
+                <img src={getTowerImageUrl(tower.name)} alt={tower.name}   style={{ height: "250px", width: "100%", objectFit: "cover", display: "block", margin: "0 auto" }} />
                 <div>Score: {tower.score}</div>
                 <div>Difficulty: {tower.diff_category}</div>
                 <div>Area: {tower.area}</div>

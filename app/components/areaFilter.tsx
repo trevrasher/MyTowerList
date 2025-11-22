@@ -1,3 +1,5 @@
+import AutoAreaFilterButton from "./autoAreaFilterButton";
+
 interface AreaFilterProps {
     areas: string[]
     selectedAreas: string[]
@@ -35,11 +37,12 @@ export default function AreaFilter({areas, setSelectedAreas, selectedAreas}: Are
     };
     
     return (
-    <div className="flex gap-8">
+    <div>
+        <AutoAreaFilterButton setSelectedAreas={setSelectedAreas} />
     {Object.entries(groupedAreas).map(([group, groupAreas]) => (
         <div key={group} className="mb-4 text-xl">
         <label className="font-bold mb-2 cursor-pointer" onClick={() => worldToggle(group)}>{group}</label>
-        <div className="grid grid-cols-2 gap-x-3">
+        <div className="columns-2 gap-2">
         {groupAreas.map((area) => (
             <label key={area} className="flex items-center space-x-2 cursor-pointer">
             <input
@@ -48,7 +51,7 @@ export default function AreaFilter({areas, setSelectedAreas, selectedAreas}: Are
                 onChange={() => handleToggle(area)}
                 className="w-4 h-4"
             />
-            <span className="text-sm">{area}</span>
+            <span className="text-sm text-zinc-300">{area}</span>
             </label>
         ))}
         </div>
