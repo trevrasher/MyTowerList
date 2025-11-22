@@ -3,10 +3,10 @@ import React, { useEffect, useState } from "react";
 import DifficultyFilter from "./components/difficultyFilter";
 import AreaFilter from "./components/areaFilter";
 import CompletedFilter from "./components/completedFilter";
-import LoginButton from "./components/loginButton";
 import SyncButton from "./components/syncCompletions";
 import AutoAreaFilterButton from "./components/autoAreaFilterButton";
 import MainHeader from "./components/mainHeader";
+import InfiniteScroll from 'react-infinite-scroll-component';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8000";
 
@@ -36,6 +36,7 @@ function getTowerImageUrl(towerName: string) {
 
 
 export default function Home() {
+  const [displayCount, setDisplayCount] = useState(20);
   const [towers, setTowers] = useState<Tower[]>([]);
   const [filteredTowers, setFilteredTowers] = useState<Tower[]>([]);
   const [completedTowers, setCompletedTowers] = useState<number[]>([]);
@@ -89,6 +90,10 @@ export default function Home() {
   useEffect(() => {
     sessionStorage.setItem('showFilters', JSON.stringify(showFilters));
   }, [showFilters]);
+
+  useEffect(() => {
+  setDisplayCount(20);
+  }, [filteredTowers]);
 
 
   useEffect(() => {
@@ -215,24 +220,30 @@ export default function Home() {
         )}
       </div>
 
-      <div className="grid grid-cols-6 gap-2.5 p-5">
-        {filteredTowers.map((tower) => {
-          const isCompleted = completedTowers.includes(tower.id);
-          
-          return (
-            <div 
-              key={tower.id} 
-              className={`border border-gray-300 p-2.5 rounded-lg ${isCompleted ? 'bg-green-900' : 'bg-black-200'}`}
-            >
-              <strong>{tower.name}</strong>
-              <img src={getTowerImageUrl(tower.name)}></img>
-              <div>Score: {tower.score}</div>
-              <div>Difficulty: {tower.diff_category}</div>
-              <div>Area: {tower.area}</div>
-            </div>
-          );
-        })}
-      </div>
+      <InfiniteScroll
+        dataLength={Math.min(filteredTowers.length, displayCount)}
+        next={() => setDisplayCount(count => count + 20)}
+        hasMore={displayCount < filteredTowers.length}
+        loader={<h4>Loading...</h4>}
+      >
+        <div className="grid grid-cols-6 gap-2.5 p-5">
+          {filteredTowers.slice(0, displayCount).map((tower) => {
+            const isCompleted = completedTowers.includes(tower.id);
+            return (
+              <div 
+                key={tower.id} 
+                className={`border border-gray-300 p-2.5 rounded-lg ${isCompleted ? 'bg-green-900' : 'bg-black-200'}`}
+              >
+                <strong>{tower.name}</strong>
+                <img src={getTowerImageUrl(tower.name)} alt={tower.name} />
+                <div>Score: {tower.score}</div>
+                <div>Difficulty: {tower.diff_category}</div>
+                <div>Area: {tower.area}</div>
+              </div>
+            );
+          })}
+        </div>
+      </InfiniteScroll>
     </>
       
 
