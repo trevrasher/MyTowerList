@@ -104,14 +104,10 @@ export default function Home() {
       fetch(`${API_BASE_URL}/api/towers/`)
         .then((res) => res.json())
         .then((data) => {
-          if (Array.isArray(data)) {
-            setTowers(data);
-            setFilteredTowers(data);
-            localStorage.setItem('towers', JSON.stringify(data));
-          } else {
-            setTowers([]);
-            setFilteredTowers([]);
-          }
+          const towersArray = Array.isArray(data.results) ? data.results : [];
+          setTowers(towersArray);
+          setFilteredTowers(towersArray);
+          localStorage.setItem('towers', JSON.stringify(towersArray));
         })
         .catch(() => {
           setTowers([]);
