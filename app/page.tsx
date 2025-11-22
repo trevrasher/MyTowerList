@@ -84,6 +84,18 @@ export default function Home() {
   }, [filteredTowers]);
 
 
+  async function fetchAllTowers() {
+    let url = `${API_BASE_URL}/api/towers/`;
+    let allTowers: Tower[] = [];
+    while (url) {
+      const res = await fetch(url);
+      const data = await res.json();
+      allTowers = allTowers.concat(data.results || []);
+      url = data.next;
+    }
+    return allTowers;
+  }
+
   useEffect(() => {
     const cached = localStorage.getItem('towers');
     if (cached) {
@@ -101,13 +113,11 @@ export default function Home() {
         setFilteredTowers([]);
       }
     } else {
-      fetch(`${API_BASE_URL}/api/towers/`)
-        .then((res) => res.json())
-        .then((data) => {
-          const towersArray = Array.isArray(data.results) ? data.results : [];
-          setTowers(towersArray);
-          setFilteredTowers(towersArray);
-          localStorage.setItem('towers', JSON.stringify(towersArray));
+      fetchAllTowers()
+        .then((allTowers) => {
+          setTowers(allTowers);
+          setFilteredTowers(allTowers);
+          localStorage.setItem('towers', JSON.stringify(allTowers));
         })
         .catch(() => {
           setTowers([]);
