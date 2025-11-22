@@ -29,6 +29,11 @@ const areas = [
   'Paradise Atoll', 'Silent Abyss', 'The Starlit Archives'
 ];
 
+function getTowerImageUrl(towerName: string) {
+  const fileName = towerName.replace(/ /g, "_") + ".webp";
+    return `https://raw.githubusercontent.com/trevrasher/MyTowerList/refs/heads/master/scripts/tower_thumbnails/${fileName}`;
+}
+
 
 export default function Home() {
   const [towers, setTowers] = useState<Tower[]>([]);
@@ -220,11 +225,10 @@ export default function Home() {
               className={`border border-gray-300 p-2.5 rounded-lg ${isCompleted ? 'bg-green-900' : 'bg-black-200'}`}
             >
               <strong>{tower.name}</strong>
+              <img src={getTowerImageUrl(tower.name)}></img>
               <div>Score: {tower.score}</div>
               <div>Difficulty: {tower.diff_category}</div>
-              <div>Type: {tower.type}</div>
               <div>Area: {tower.area}</div>
-              <div>Creators: {tower.creators}</div>
             </div>
           );
         })}
