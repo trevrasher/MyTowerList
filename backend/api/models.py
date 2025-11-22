@@ -65,7 +65,6 @@ class Tower(models.Model):
         ]
     )
     badge = models.ForeignKey('Badge', on_delete=models.SET_NULL, null=True, blank=True, related_name='tower')
-    image = models.CharField(max_length=300, blank=True)
 
 class Creator(models.Model):
     name = models.CharField(max_length=100, unique=True)
