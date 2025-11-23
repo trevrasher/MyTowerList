@@ -227,12 +227,11 @@ export default function Home() {
           {filteredTowers.slice(0, displayCount).map((tower) => {
             const isCompleted = completedTowers.includes(tower.id);
             return (
-              <div 
-                key={tower.id} 
-                className={`border border-gray-300 p-2.5 rounded-lg ${isCompleted ? 'bg-green-900' : 'bg-black-200'}`}
-              >
+              <div key={tower.id} >
+                <img src={getTowerImageUrl(tower.name)} alt={tower.name} 
+                className={`h-[300px] w-full object-cover block mx-auto rounded-lg shadow-lg` +
+                (isCompleted ? " ring-4 ring-green-400 shadow-green-400" : "")}/>
                 <strong>{tower.name}</strong>
-                <img src={getTowerImageUrl(tower.name)} alt={tower.name}  className="h-[300px] w-full object-cover block mx-auto" />
                 <div>Score: {tower.score}</div>
                 <div>Difficulty: {tower.diff_category}</div>
                 <div>Area: {tower.area}</div>
