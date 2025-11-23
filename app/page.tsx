@@ -25,9 +25,23 @@ const areas = [
   'Paradise Atoll', 'Silent Abyss', 'The Starlit Archives'
 ];
 
+const diffColors: { [key: string]: string } = {
+  easy: "#7CFF4D",           
+  medium: "#FFFF00",       
+  hard: "#FFA200",           
+  difficult: "#FF5050",      
+  challenging: "#C80000",    
+  intense: "#000000",        
+  remorseless: "#FF00E6",    
+  insane: "#0000FF",         
+  extreme: "#0389FF",        
+  terrifying: "#00FFFF",     
+  catastrophic: "#FFFFFF"    
+};
+
 function getTowerImageUrl(towerName: string) {
   const fileName = towerName.replace(/ /g, "_") + ".webp";
-    return `https://raw.githubusercontent.com/trevrasher/MyTowerList/refs/heads/master/scripts/tower_thumbnails/${fileName}`;
+    return `https://raw.githubusercontent.com/trevrasher/MyTowerList/refs/heads/master/assets/tower_thumbnails/${fileName}`;
 }
 
 
@@ -227,14 +241,19 @@ export default function Home() {
           {filteredTowers.slice(0, displayCount).map((tower) => {
             const isCompleted = completedTowers.includes(tower.id);
             return (
-              <div key={tower.id} >
+              <div key={tower.id} className="relative">
                 <img src={getTowerImageUrl(tower.name)} alt={tower.name} 
-                className={`h-[300px] w-full object-cover block mx-auto rounded-lg shadow-lg mb-2` +
-                (isCompleted ? " ring-2 ring-green-400" : "")}/>
+                  className={`h-[300px] w-full object-cover block mx-auto rounded-lg shadow-lg mb-2` +
+                  (isCompleted ? " ring-2 ring-green-400" : "")}
+                />
+                <div
+                  className="absolute bottom-2 right-2 w-6 h-6 rounded-md border-2 border-white shadow"
+                  style={{ backgroundColor: diffColors[tower.diff_category] || "#fff" }}
+                  title={tower.diff_category}
+                />
                 <strong>{tower.name}</strong>
                 <div>Score: {tower.score}</div>
-                <div>Difficulty: {tower.diff_category.charAt(0).toUpperCase() + tower.diff_category.slice(1)} ({tower.difficulty}) </div>
-                <div>Area: {tower.area}</div>
+                <div>{tower.diff_category.charAt(0).toUpperCase() + tower.diff_category.slice(1)} ({tower.difficulty}) </div>
               </div>
             );
           })}
