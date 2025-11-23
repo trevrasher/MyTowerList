@@ -205,7 +205,7 @@ export default function Home() {
 
   return (
     <>
-      <MainHeader/>
+      <MainHeader isAuthenticated={isAuthenticated}/>
       <FilterBar
       areas={areas}
       setSelectedAreas={setSelectedAreas}
@@ -214,6 +214,7 @@ export default function Home() {
       setDifficultyRange={setDifficultyRange}
       completedToggle={completedToggle}
       setCompletedToggle={setCompletedToggle}
+      isAuthenticated={isAuthenticated}
     />
       
       <InfiniteScroll

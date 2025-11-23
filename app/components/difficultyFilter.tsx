@@ -84,7 +84,7 @@ export default function DifficultyFilter({ difficultyRange, setDifficultyRange }
               <div
                 key={key}
                 {...restProps}
-                className="h-10 w-10 bg-blue-500 rounded-full flex items-center justify-center">
+                className="h-10 w-10 bg-zinc-600 rounded-full flex items-center justify-center">
                 <span className="text-xs text-white">{difficultyRange[index].toFixed(1)}</span>
               </div>
             );

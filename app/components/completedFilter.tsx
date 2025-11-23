@@ -9,14 +9,14 @@ export default function CompletedFilter ({completedToggle, setCompletedToggle} :
 
     return (
         <div>
-            <label className="flex items-center space-x-2 cursor-pointer w-30 py-4 bg-zinc-700 text-white rounded">
+            <label className="flex items-center cursor-pointer w-40 py-4 bg-zinc-700 text-white rounded hover:bg-zinc-400 transition">
                 <input
                 type = "checkbox"
                 checked = {completedToggle}
                 onChange={() => setCompletedToggle(!completedToggle)}
-                className="daily-checkbox scale-200"
+                className="daily-checkbox"
                 />
-                <span className="text-sm">Show Completed</span>
+                <span>Hide Completed</span>
             </label>
         </div>
     )
