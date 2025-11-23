@@ -232,7 +232,7 @@ export default function Home() {
                 className={`border border-gray-300 p-2.5 rounded-lg ${isCompleted ? 'bg-green-900' : 'bg-black-200'}`}
               >
                 <strong>{tower.name}</strong>
-                <img src={getTowerImageUrl(tower.name)} alt={tower.name}   style={{ height: "250px", width: "100%", objectFit: "cover", display: "block", margin: "0 auto" }} />
+                <img src={getTowerImageUrl(tower.name)} alt={tower.name}  className="h-[300px] w-full object-cover block mx-auto" />
                 <div>Score: {tower.score}</div>
                 <div>Difficulty: {tower.diff_category}</div>
                 <div>Area: {tower.area}</div>

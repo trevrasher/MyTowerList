@@ -49,7 +49,7 @@ export default function FilterBar({
         <div className="flex gap-x-4">
           <div className="relative flex justify-center">
               <button
-              className="w-30 py-4 bg-zinc-700 text-white rounded hover:bg-zinc-400 transition"
+              className="w-30 bg-zinc-700 text-white rounded hover:bg-zinc-400 transition"
               onClick={() => setFilterSelect("difficulty")}
               >
               Difficulty

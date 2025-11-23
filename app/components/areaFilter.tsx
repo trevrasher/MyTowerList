@@ -45,14 +45,14 @@ export default function AreaFilter({areas, setSelectedAreas, selectedAreas, isAu
         <label className="font-bold mb-2 cursor-pointer" onClick={() => worldToggle(group)}>{group}</label>
         <div className="columns-2 gap-2">
         {groupAreas.map((area) => (
-            <label key={area} className="flex items-center space-x-2 cursor-pointer break-inside-avoid">
+            <label key={area} className="flex items-center space-x-2 cursor-pointer break-inside-avoid pb-1">
             <input
                 type="checkbox"
                 checked={selectedAreas.includes(area)}
                 onChange={() => handleToggle(area)}
                 className="daily-checkbox"
             />
-            <span className="text-sm text-zinc-300">{area}</span>
+            <span className="text-sm text-zinc-300">{area === "The Starlit Archives" ? "Starlit Archives" : area}</span>
             </label>
         ))}
         </div>
