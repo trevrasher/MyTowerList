@@ -205,11 +205,11 @@ export default function Home() {
   useEffect(() =>  {
     let filtered = Array.isArray(towers) ? towers : [];
 
-    if(selectedAreas.length>0) {
-      filtered = filtered.filter(tower =>
-        selectedAreas.includes(tower.area)
-      );
-    }
+  if (Array.isArray(selectedAreas) && selectedAreas.length > 0) {
+    filtered = filtered.filter(tower =>
+      selectedAreas.includes(tower.area)
+    );
+  }
 
     filtered = filtered.filter(tower => 
       tower.difficulty >= difficultyRange[0] && tower.difficulty <= difficultyRange[1]

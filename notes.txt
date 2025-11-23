@@ -5,3 +5,11 @@ Smth in Starlit ??
 FFAST
 
 change render order for login button
+
+make score text grey
+use cards
+make sure 
+make hide completed change colors instead
+move logout/sync top right
+make padding between rows bigger
+fix difficulty filter updating live
