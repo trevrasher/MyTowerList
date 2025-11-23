@@ -233,7 +233,7 @@ export default function Home() {
                 (isCompleted ? " ring-2 ring-green-400" : "")}/>
                 <strong>{tower.name}</strong>
                 <div>Score: {tower.score}</div>
-                <div>Difficulty: {tower.diff_category}</div>
+                <div>Difficulty: {tower.diff_category.charAt(0).toUpperCase() + tower.diff_category.slice(1)} ({tower.difficulty}) </div>
                 <div>Area: {tower.area}</div>
               </div>
             );
