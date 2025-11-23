@@ -66,7 +66,18 @@ export default function Home() {
   useEffect(() => {
     if (typeof window !== "undefined") {
       const stored = sessionStorage.getItem('selectedAreas');
-      if (stored) setSelectedAreas(JSON.parse(stored));
+      if (stored) {
+        try {
+          const parsed = JSON.parse(stored);
+          if (Array.isArray(parsed) && parsed.every(item => typeof item === "string")) {
+            setSelectedAreas(parsed);
+          } else {
+            setSelectedAreas(areas); 
+          }
+        } catch {
+          setSelectedAreas(areas);
+        }
+      }
     }
   }, []);
 
@@ -252,22 +263,15 @@ export default function Home() {
           {filteredTowers.slice(0, displayCount).map((tower) => {
             const isCompleted = completedTowers.includes(tower.id);
             return (
-              <div key={tower.id} className="relative">
-                <img src={getTowerImageUrl(tower.name)} alt={tower.name} 
-                  className={`h-[300px] w-full object-cover block mx-auto rounded-lg shadow-lg mb-2` +
-                  (isCompleted ? " ring-2 ring-green-400" : "")}
-                />
-                <div
-                  className="absolute bottom-14 right-0 w-14 h-14 rounded-md border-2 border-white shadow z-10 flex items-center justify-center"
-                  style={{ backgroundColor: diffColors[tower.diff_category] || "#fff" }}
-                  title={tower.diff_category}
-                >
+              <div key={tower.id} className="relative flex flex-col">
+                <img src={getTowerImageUrl(tower.name)} alt={tower.name} className={`h-[300px] w-full object-cover block mx-auto rounded-lg shadow-lg mb-2` + (isCompleted ? " ring-2 ring-green-400" : "")}/>
+                <div style={{ backgroundColor: diffColors[tower.diff_category] || "#fff" }} className="absolute bottom-14 right-0 w-14 h-14 rounded-md border-2 border-white shadow z-10 flex items-center justify-center" >
                   <span className="right-0.5 text-xl font-bold text-white text-outline ">
                     {getTowerDifficultyWord(tower)}
                   </span>
                 </div>
-                <strong>{tower.name}</strong>
-                <div>Score: {tower.score}</div>
+                <strong className="whitespace-nowrap max-w-full overflow-hidden text-ellipsis" >{tower.name}</strong>
+                <span className="whitespace-nowrap max-w-full overflow-hidden text-ellipsis">Score: {tower.score}</span>
               </div>
             );
           })}
