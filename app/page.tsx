@@ -229,8 +229,8 @@ export default function Home() {
             return (
               <div key={tower.id} >
                 <img src={getTowerImageUrl(tower.name)} alt={tower.name} 
-                className={`h-[300px] w-full object-cover block mx-auto rounded-lg shadow-lg` +
-                (isCompleted ? " ring-4 ring-green-400 shadow-green-400" : "")}/>
+                className={`h-[300px] w-full object-cover block mx-auto rounded-lg shadow-lg mb-2` +
+                (isCompleted ? " ring-2 ring-green-400" : "")}/>
                 <strong>{tower.name}</strong>
                 <div>Score: {tower.score}</div>
                 <div>Difficulty: {tower.diff_category}</div>
