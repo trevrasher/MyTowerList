@@ -132,34 +132,17 @@ export default function Home() {
     return allTowers;
   }
 
+
   useEffect(() => {
-    const cached = localStorage.getItem('towers');
-    if (cached) {
-      try {
-        const towersData = JSON.parse(cached);
-        if (Array.isArray(towersData)) {
-          setTowers(towersData);
-          setFilteredTowers(towersData);
-        } else {
-          setTowers([]);
-          setFilteredTowers([]);
-        }
-      } catch {
+    fetchAllTowers()
+      .then((allTowers) => {
+        setTowers(allTowers);
+        setFilteredTowers(allTowers);
+      })
+      .catch(() => {
         setTowers([]);
         setFilteredTowers([]);
-      }
-    } else {
-      fetchAllTowers()
-        .then((allTowers) => {
-          setTowers(allTowers);
-          setFilteredTowers(allTowers);
-          localStorage.setItem('towers', JSON.stringify(allTowers));
-        })
-        .catch(() => {
-          setTowers([]);
-          setFilteredTowers([]);
-        });
-    }
+      });
   }, []);
 
   useEffect(() => {
@@ -172,7 +155,6 @@ export default function Home() {
       window.dispatchEvent(new Event('storage'));
       localStorage.setItem('refresh_token', refresh);
       setIsAuthenticated(true);
-      
       window.history.replaceState({}, document.title, '/');
     } else {
       const token = localStorage.getItem('access_token');
@@ -183,35 +165,26 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
-    const cached = localStorage.getItem('completedTowers');
-    if (cached) {
-      const data = JSON.parse(cached);
-      const ids = data.map((item: any) => item.id);
-      setCompletedTowers(ids);
-    } else {
-      if (!isAuthenticated) return;
-      const token = localStorage.getItem('access_token');
-      if (token) {
-        fetch(`${API_BASE_URL}/api/profile/completed-towers/`, {
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json'
-          }
+    if (!isAuthenticated) return;
+    const token = localStorage.getItem('access_token');
+    if (token) {
+      fetch(`${API_BASE_URL}/api/profile/completed-towers/`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      })
+        .then((res) => {
+          if (!res.ok) throw new Error('Failed to fetch');
+          return res.json();
         })
-          .then((res) => {
-            if (!res.ok) throw new Error('Failed to fetch');
-            return res.json();
-          })
-          .then((data) => {
-            const ids = data.map((item: any) => item.id);
-            console.log('Completed tower IDs:', ids);
-            setCompletedTowers(ids);
-            localStorage.setItem('completedTowers', JSON.stringify(data));
-          })
-          .catch((error) => console.error('Error:', error));
-      }
+        .then((data) => {
+          const ids = data.map((item: any) => item.id);
+          setCompletedTowers(ids);
+        })
+        .catch((error) => console.error('Error:', error));
     }
-  }, [isAuthenticated])
+  }, [isAuthenticated]);
 
   useEffect(() =>  {
     let filtered = Array.isArray(towers) ? towers : [];

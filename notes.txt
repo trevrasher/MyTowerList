@@ -14,3 +14,4 @@ move logout/sync top right
 make padding between rows bigger
 fix difficulty filter updating live
 paradise atoll is replacing towers???
+
