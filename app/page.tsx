@@ -26,22 +26,33 @@ const areas = [
 ];
 
 const diffColors: { [key: string]: string } = {
-  easy: "#7CFF4D",           
-  medium: "#FFFF00",       
-  hard: "#FFA200",           
-  difficult: "#FF5050",      
-  challenging: "#C80000",    
+  easy: "#59b338ff",           
+  medium: "#c5c502ff",       
+  hard: "#b17000ff",           
+  difficult: "#cc3e3eff",      
+  challenging: "#720000ff",    
   intense: "#000000",        
-  remorseless: "#FF00E6",    
+  remorseless: "#a70096ff",    
   insane: "#0000FF",         
   extreme: "#0389FF",        
-  terrifying: "#00FFFF",     
+  terrifying: "#00b4b4ff",     
   catastrophic: "#FFFFFF"    
 };
 
 function getTowerImageUrl(towerName: string) {
   const fileName = towerName.replace(/ /g, "_") + ".webp";
     return `https://raw.githubusercontent.com/trevrasher/MyTowerList/refs/heads/master/assets/tower_thumbnails/${fileName}`;
+}
+
+function getTowerDifficultyWord(tower: Tower) {
+  const decimalStr = tower.difficulty.toString().split(".")[1] || "0";
+  const decimalPart = parseFloat("0." + decimalStr);
+  if (decimalPart >= 0.00 && decimalPart <= 0.15) return "Bot";
+  if (decimalPart >= 0.16 && decimalPart <= 0.35) return "Low";
+  if (decimalPart >= 0.36 && decimalPart <= 0.6) return "Mid";
+  if (decimalPart >= 0.61 && decimalPart <= 0.8) return "High";
+  if (decimalPart >= 0.81 && decimalPart <= 0.99) return "Peak";
+  return "";
 }
 
 
@@ -247,13 +258,16 @@ export default function Home() {
                   (isCompleted ? " ring-2 ring-green-400" : "")}
                 />
                 <div
-                  className="absolute bottom-2 right-2 w-6 h-6 rounded-md border-2 border-white shadow"
+                  className="absolute bottom-14 right-0 w-14 h-14 rounded-md border-2 border-white shadow z-10 flex items-center justify-center"
                   style={{ backgroundColor: diffColors[tower.diff_category] || "#fff" }}
                   title={tower.diff_category}
-                />
+                >
+                  <span className="right-0.5 text-xl font-bold text-white text-outline ">
+                    {getTowerDifficultyWord(tower)}
+                  </span>
+                </div>
                 <strong>{tower.name}</strong>
                 <div>Score: {tower.score}</div>
-                <div>{tower.diff_category.charAt(0).toUpperCase() + tower.diff_category.slice(1)} ({tower.difficulty}) </div>
               </div>
             );
           })}

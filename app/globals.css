@@ -51,3 +51,9 @@ body {
   border-width: 0 2px 2px 0;
   transform: rotate(45deg);
 }
+
+.text-outline {
+  color: white; 
+  text-shadow: 
+  0.1em 0 black, 0 0.1em black, -0.1em 0 black, 0 -0.1em black, -0.1em -0.1em black, -0.1em 0.1em black, 0.1em -0.1em black, 0.1em 0.1em black;
+}
