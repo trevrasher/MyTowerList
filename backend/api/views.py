@@ -19,7 +19,7 @@ class GetTowerByName(generics.RetrieveAPIView):
 class TowerListView(generics.ListAPIView):
     serializer_class = TowerSerializer
     def get_queryset(self):
-        queryset = Tower.objects.select_related('area', 'badge').prefetch_related('creators_m2m').all().order_by('-score')
+        queryset = Tower.objects.select_related('area', 'badge').prefetch_related('creators_m2m').all().order_by('-score', 'id')
 
         areas = self.request.query_params.getlist('area')
         if areas:
