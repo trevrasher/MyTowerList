@@ -41,7 +41,7 @@ const diffColors: { [key: string]: string } = {
 
 function getTowerImageUrl(towerName: string) {
   const fileName = towerName.replace(/ /g, "_") + ".webp";
-    return `https://raw.githubusercontent.com/trevrasher/MyTowerList/refs/heads/master/assets/tower_thumbnails/${fileName}`;
+  return `https://raw.githubusercontent.com/trevrasher/MyTowerList/refs/heads/master/assets/tower_thumbnails/${fileName}`;
 }
 
 function getTowerDifficultyWord(tower: Tower) {
@@ -55,115 +55,38 @@ function getTowerDifficultyWord(tower: Tower) {
   return "";
 }
 
+// Helper to build query params for backend filtering
+function buildQueryParams(
+  selectedAreas: string[],
+  difficultyRange: number[],
+  completedToggle: boolean,
+  completedTowers: number[]
+) {
+  const params = new URLSearchParams();
+  if (selectedAreas.length && selectedAreas.length !== areas.length) {
+    selectedAreas.forEach(area => params.append("area", area));
+  }
+  params.append("difficulty_min", difficultyRange[0].toString());
+  params.append("difficulty_max", difficultyRange[1].toString());
+  if (completedToggle && completedTowers.length) {
+    params.append("exclude_completed", "true");
+    completedTowers.forEach(id => params.append("completed_ids", id.toString()));
+  }
+  return params.toString();
+}
 
 export default function Home() {
-  const [displayCount, setDisplayCount] = useState(20);
   const [towers, setTowers] = useState<Tower[]>([]);
-  const [filteredTowers, setFilteredTowers] = useState<Tower[]>([]);
+  const [nextUrl, setNextUrl] = useState<string | null>(null);
+  const [hasMore, setHasMore] = useState(true);
   const [completedTowers, setCompletedTowers] = useState<number[]>([]);
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   const [selectedAreas, setSelectedAreas] = useState<string[]>(areas);
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      const stored = sessionStorage.getItem('selectedAreas');
-      if (stored) {
-        try {
-          const parsed = JSON.parse(stored);
-          if (Array.isArray(parsed) && parsed.every(item => typeof item === "string")) {
-            setSelectedAreas(parsed);
-          } else {
-            setSelectedAreas(areas); 
-          }
-        } catch {
-          setSelectedAreas(areas);
-        }
-      }
-    }
-  }, []);
-
   const [completedToggle, setCompletedToggle] = useState<boolean>(false);
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      const stored = sessionStorage.getItem('completedToggle');
-      if (stored) setCompletedToggle(JSON.parse(stored));
-    }
-  }, []);
-
   const [difficultyRange, setDifficultyRange] = useState<number[]>([1, 12]);
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      const stored = sessionStorage.getItem('difficultyRange');
-      if (stored) setDifficultyRange(JSON.parse(stored));
-    }
-  }, []);
+  const [loading, setLoading] = useState(false);
 
-
-
-
-
-  useEffect(() => {
-  sessionStorage.setItem('selectedAreas', JSON.stringify(selectedAreas));
-  }, [selectedAreas]);
-
-  useEffect(() => {
-    sessionStorage.setItem('completedToggle', JSON.stringify(completedToggle));
-  }, [completedToggle]);
-
-  useEffect(() => {
-    sessionStorage.setItem('difficultyRange', JSON.stringify(difficultyRange));
-  }, [difficultyRange]);
-
-
-
-  useEffect(() => {
-  setDisplayCount(20);
-  }, [filteredTowers]);
-
-
-  async function fetchAllTowers() {
-    let url = `${API_BASE_URL}/api/towers/`;
-    let allTowers: Tower[] = [];
-    while (url) {
-      const res = await fetch(url);
-      const data = await res.json();
-      allTowers = allTowers.concat(data.results || []);
-      url = data.next;
-    }
-    return allTowers;
-  }
-
-
-  useEffect(() => {
-    fetchAllTowers()
-      .then((allTowers) => {
-        setTowers(allTowers);
-        setFilteredTowers(allTowers);
-      })
-      .catch(() => {
-        setTowers([]);
-        setFilteredTowers([]);
-      });
-  }, []);
-
-  useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    const access = params.get('access');
-    const refresh = params.get('refresh');
-    
-    if (access && refresh) {
-      localStorage.setItem('access_token', access);
-      window.dispatchEvent(new Event('storage'));
-      localStorage.setItem('refresh_token', refresh);
-      setIsAuthenticated(true);
-      window.history.replaceState({}, document.title, '/');
-    } else {
-      const token = localStorage.getItem('access_token');
-      if (token) {
-        setIsAuthenticated(true);
-      }
-    }
-  }, []);
-
+  // Fetch completed towers from backend if authenticated
   useEffect(() => {
     if (!isAuthenticated) return;
     const token = localStorage.getItem('access_token');
@@ -186,54 +109,82 @@ export default function Home() {
     }
   }, [isAuthenticated]);
 
-  useEffect(() =>  {
-    let filtered = Array.isArray(towers) ? towers : [];
+  // Auth logic (unchanged)
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const access = params.get('access');
+    const refresh = params.get('refresh');
+    
+    if (access && refresh) {
+      localStorage.setItem('access_token', access);
+      window.dispatchEvent(new Event('storage'));
+      localStorage.setItem('refresh_token', refresh);
+      setIsAuthenticated(true);
+      window.history.replaceState({}, document.title, '/');
+    } else {
+      const token = localStorage.getItem('access_token');
+      if (token) {
+        setIsAuthenticated(true);
+      }
+    }
+  }, []);
 
-  if (Array.isArray(selectedAreas) && selectedAreas.length > 0) {
-    filtered = filtered.filter(tower =>
-      selectedAreas.includes(tower.area)
-    );
+  // Fetch towers from backend with filters and pagination
+  const fetchTowersPage = async (url: string | null, reset = false) => {
+    if (!url) return;
+    setLoading(true);
+    const res = await fetch(url);
+    const data = await res.json();
+    setTowers(prev => reset ? (data.results || []) : [...prev, ...(data.results || [])]);
+    setNextUrl(data.next);
+    setHasMore(Boolean(data.next));
+    setLoading(false);
+  };
+
+  // Build the initial URL with filters
+  function getInitialUrl() {
+    const query = buildQueryParams(selectedAreas, difficultyRange, completedToggle, completedTowers);
+    return `${API_BASE_URL}/api/towers/?${query}`;
   }
 
-    filtered = filtered.filter(tower => 
-      tower.difficulty >= difficultyRange[0] && tower.difficulty <= difficultyRange[1]
-    );
+  // When filters change, reset towers and fetch first page
+  useEffect(() => {
+    setTowers([]);
+    const url = getInitialUrl();
+    setNextUrl(url);
+    setHasMore(true);
+    fetchTowersPage(url, true);
+    // eslint-disable-next-line
+  }, [selectedAreas, difficultyRange, completedToggle, completedTowers]);
 
-    if (completedToggle) {
-      filtered = filtered.filter(tower => 
-        !completedTowers.includes(tower.id)
-      );
+  // Infinite scroll fetch
+  const fetchMoreTowers = () => {
+    if (nextUrl && !loading) {
+      fetchTowersPage(nextUrl);
     }
-
-    setFilteredTowers(filtered);
-
-  }, [selectedAreas, towers, difficultyRange, completedToggle, completedTowers])
-
-
-
+  };
 
   return (
     <>
       <MainHeader isAuthenticated={isAuthenticated}/>
       <FilterBar
-      areas={areas}
-      setSelectedAreas={setSelectedAreas}
-      selectedAreas={selectedAreas}
-      difficultyRange={difficultyRange}
-      setDifficultyRange={setDifficultyRange}
-      completedToggle={completedToggle}
-      setCompletedToggle={setCompletedToggle}
-      isAuthenticated={isAuthenticated}
-    />
-      
+        areas={areas}
+        setSelectedAreas={setSelectedAreas}
+        selectedAreas={selectedAreas}
+        difficultyRange={difficultyRange}
+        setDifficultyRange={setDifficultyRange}
+        completedToggle={completedToggle}
+        setCompletedToggle={setCompletedToggle}
+        isAuthenticated={isAuthenticated}
+      />
       <InfiniteScroll
-        dataLength={displayCount}
-        next={() => setDisplayCount(count => count + 20)}
-        hasMore={displayCount < filteredTowers.length}
+        dataLength={towers.length}
+        next={fetchMoreTowers}
+        hasMore={hasMore}
         loader={<h4>Loading...</h4>}
       >
         <div className="grid grid-cols-6 gap-2.5 p-5">
-          {filteredTowers.slice(0, displayCount).map((tower) => {
+          {towers.map((tower) => {
             const isCompleted = completedTowers.includes(tower.id);
             return (
               <div key={tower.id} className="relative flex flex-col">
@@ -251,8 +202,6 @@ export default function Home() {
         </div>
       </InfiniteScroll>
     </>
-      
-
   );
 }
 

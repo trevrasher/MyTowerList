@@ -1,6 +1,5 @@
 from rest_framework.response import Response
 from rest_framework import generics
-from urllib.parse import unquote
 from .models import Tower, Area
 from .serializer import TowerSerializer
 import requests
@@ -8,6 +7,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
 from rest_framework import status
 import csv
+from rest_framework.pagination import LimitOffsetPagination
 
 etohUniverseID = 3264581003
 
@@ -15,6 +15,27 @@ class GetTowerByName(generics.RetrieveAPIView):
     queryset = Tower.objects.select_related('area', 'badge').prefetch_related('creators_m2m').all()
     serializer_class = TowerSerializer
     lookup_field = 'name'
+
+class TowerListView(generics.ListAPIView):
+    serializer_class = TowerSerializer
+    def get_queryset(self):
+        queryset = Tower.objects.select_related('area', 'badge').prefetch_related('creators_m2m').all().order_by('-score')
+
+        areas = self.request.query_params.getlist('area')
+        if areas:
+            queryset = queryset.filter(area__name__in=areas)
+
+        diff_min = self.request.query_params.get('difficulty_min')
+        diff_max = self.request.query_params.get('difficulty_max')
+        if diff_min is not None and diff_max is not None:
+            queryset = queryset.filter(difficulty__gte=diff_min, difficulty__lte=diff_max)
+
+        exclude_completed = self.request.query_params.get('exclude_completed')
+        completed_ids = self.request.query_params.getlist('completed_ids')
+        if exclude_completed == "true" and completed_ids:
+            queryset = queryset.exclude(id__in=completed_ids)
+        return queryset
+
     
 
 class GetAllTowersByScore(generics.ListAPIView):
