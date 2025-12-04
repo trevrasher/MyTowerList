@@ -32,6 +32,7 @@ export default function DifficultyFilter({ difficultyRange, setDifficultyRange }
           min={1}
           max={12}
           values={difficultyRange}
+          onChange={() => {}} 
           onFinalChange={(values) => setDifficultyRange([values[0], values[1]])}
           renderTrack={({ props, children }) => {
             const { key, ...restProps } = props as any;
