@@ -1,9 +1,12 @@
 import { Range, getTrackBackground } from 'react-range';
+import { useState, useEffect } from 'react';
 
 interface DifficultyFilterProps {
   difficultyRange: number[];
   setDifficultyRange: (values: [number, number]) => void;
 }
+
+
 
 const SEGMENTS: string[] = [
   '#7CFF4D', 
@@ -21,18 +24,24 @@ const SEGMENTS: string[] = [
 ];
 
 export default function DifficultyFilter({ difficultyRange, setDifficultyRange }: DifficultyFilterProps) {
+  const [tempDifficultyRange, setTempDifficultyRange] = useState<number[]>(difficultyRange);
+
+  useEffect(() => {
+    setTempDifficultyRange(difficultyRange);
+  }, [difficultyRange]);
+
   return (
     <div className="p-5 bg-zinc-900 rounded-lg w-1/1">
       <div>
         <div className="block mb-2 font-semibold text-white">
-          Difficulty Range: {difficultyRange[0].toFixed(1)} - {difficultyRange[1].toFixed(1)}
+          Difficulty Range: {tempDifficultyRange[0].toFixed(1)} - {tempDifficultyRange[1].toFixed(1)}
         </div>
         <Range
           step={0.1}
           min={1}
           max={12}
-          values={difficultyRange}
-          onChange={() => {}} 
+          values={tempDifficultyRange}
+          onChange={(values) => setTempDifficultyRange([values[0], values[1]])}
           onFinalChange={(values) => setDifficultyRange([values[0], values[1]])}
           renderTrack={({ props, children }) => {
             const { key, ...restProps } = props as any;
@@ -49,24 +58,24 @@ export default function DifficultyFilter({ difficultyRange, setDifficultyRange }
                       const startPct = ((segStart - 1) / 11) * 100;
                       const endPct = ((segEnd - 1) / 11) * 100;
 
-                      if (difficultyRange[1] <= segStart || difficultyRange[0] >= segEnd) {
+                      if (tempDifficultyRange[1] <= segStart || tempDifficultyRange[0] >= segEnd) {
                         return `#7078837a ${startPct}%, #7078837a ${endPct}%`;
                       }
                     
-                      if (difficultyRange[0] <= segStart && difficultyRange[1] >= segEnd) {
+                      if (tempDifficultyRange[0] <= segStart && tempDifficultyRange[1] >= segEnd) {
                         return `${SEGMENTS[i]} ${startPct}%, ${SEGMENTS[i]} ${endPct}%`;
                       }
 
-                      if (difficultyRange[0] > segStart && difficultyRange[0] < segEnd) {
-                        const fillPct = ((difficultyRange[0] - segStart) / 1) * (endPct - startPct) + startPct;
+                      if (tempDifficultyRange[0] > segStart && tempDifficultyRange[0] < segEnd) {
+                        const fillPct = ((tempDifficultyRange[0] - segStart) / 1) * (endPct - startPct) + startPct;
                         return [
                           `#7078837a ${startPct}%, #7078837a ${fillPct}%`,
                           `${SEGMENTS[i]} ${fillPct}%, ${SEGMENTS[i]} ${endPct}%`
                         ].join(', ');
                       }
 
-                      if (difficultyRange[1] > segStart && difficultyRange[1] < segEnd) {
-                        const fillPct = ((difficultyRange[1] - segStart) / 1) * (endPct - startPct) + startPct;
+                      if (tempDifficultyRange[1] > segStart && tempDifficultyRange[1] < segEnd) {
+                        const fillPct = ((tempDifficultyRange[1] - segStart) / 1) * (endPct - startPct) + startPct;
                         return [
                           `${SEGMENTS[i]} ${startPct}%, ${SEGMENTS[i]} ${fillPct}%`,
                           `#7078837a ${fillPct}%, #7078837a ${endPct}%`
@@ -86,7 +95,7 @@ export default function DifficultyFilter({ difficultyRange, setDifficultyRange }
                 key={key}
                 {...restProps}
                 className="h-10 w-10 bg-zinc-600 rounded-full flex items-center justify-center">
-                <span className="text-xs text-white">{difficultyRange[index].toFixed(1)}</span>
+                <span className="text-xs text-white">{tempDifficultyRange[index].toFixed(1)}</span>
               </div>
             );
           }}

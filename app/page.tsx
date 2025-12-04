@@ -55,7 +55,6 @@ function getTowerDifficultyWord(tower: Tower) {
   return "";
 }
 
-// Helper to build query params for backend filtering
 function buildQueryParams(
   selectedAreas: string[],
   difficultyRange: number[],
@@ -86,7 +85,6 @@ export default function Home() {
   const [difficultyRange, setDifficultyRange] = useState<number[]>([1, 12]);
   const [loading, setLoading] = useState(false);
 
-  // Fetch completed towers from backend if authenticated
   useEffect(() => {
     if (!isAuthenticated) return;
     const token = localStorage.getItem('access_token');
@@ -109,7 +107,6 @@ export default function Home() {
     }
   }, [isAuthenticated]);
 
-  // Auth logic (unchanged)
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const access = params.get('access');
@@ -129,7 +126,6 @@ export default function Home() {
     }
   }, []);
 
-  // Fetch towers from backend with filters and pagination
   const fetchTowersPage = async (url: string | null, reset = false) => {
     if (!url) return;
     setLoading(true);
@@ -141,23 +137,19 @@ export default function Home() {
     setLoading(false);
   };
 
-  // Build the initial URL with filters
   function getInitialUrl() {
     const query = buildQueryParams(selectedAreas, difficultyRange, completedToggle, completedTowers);
     return `${API_BASE_URL}/api/towers/?${query}`;
   }
 
-  // When filters change, reset towers and fetch first page
   useEffect(() => {
     setTowers([]);
     const url = getInitialUrl();
     setNextUrl(url);
     setHasMore(true);
     fetchTowersPage(url, true);
-    // eslint-disable-next-line
   }, [selectedAreas, difficultyRange, completedToggle, completedTowers]);
 
-  // Infinite scroll fetch
   const fetchMoreTowers = () => {
     if (nextUrl && !loading) {
       fetchTowersPage(nextUrl);
