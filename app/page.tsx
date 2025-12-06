@@ -41,7 +41,14 @@ const diffColors: { [key: string]: string } = {
 
 function getTowerImageUrl(towerName: string) {
   const fileName = towerName.replace(/ /g, "_") + ".webp";
+
   return `https://raw.githubusercontent.com/trevrasher/MyTowerList/refs/heads/master/assets/tower_thumbnails/${fileName}`;
+}
+
+function getTowerAreaImage(towerArea: string) {
+  const fileName = towerArea.replace(/ /g, "").replace(/ö/g, "o") + ".webp";
+  console.log(fileName);
+  return `https://raw.githubusercontent.com/trevrasher/MyTowerList/refs/heads/master/assets/area_thumbnails/${fileName}`;
 }
 
 function getTowerDifficultyWord(tower: Tower) {
@@ -180,14 +187,16 @@ export default function Home() {
             const isCompleted = completedTowers.includes(tower.id);
             return (
               <div key={tower.id} className="relative flex flex-col">
-                <img src={getTowerImageUrl(tower.name)} alt={tower.name} className={`h-[300px] w-full object-cover block mx-auto rounded-lg shadow-lg mb-2` + (isCompleted ? " ring-2 ring-green-400" : "")}/>
+                <img src={getTowerImageUrl(tower.name)} alt={tower.name} className={`h-90 w-full object-cover block mx-auto rounded-lg shadow-lg mb-2` + (isCompleted ? " ring-2 ring-green-400" : "")}/>
                 <div style={{ backgroundColor: diffColors[tower.diff_category] || "#fff" }} className="absolute bottom-14 right-0 w-14 h-14 rounded-md border-2 border-white shadow z-10 flex items-center justify-center" >
+                  <img src={getTowerAreaImage(tower.area)}>
+                  </img>
                   <span className="right-0.5 text-xl font-bold text-white text-outline ">
                     {getTowerDifficultyWord(tower)}
                   </span>
                 </div>
                 <strong className="whitespace-nowrap max-w-full overflow-hidden text-ellipsis" >{tower.name}</strong>
-                <span className="whitespace-nowrap max-w-full overflow-hidden text-ellipsis">Score: {tower.score}</span>
+                <span className="whitespace-nowrap max-w-full overflow-hidden text-ellipsis text-zinc-500">Score: {tower.score}</span>
               </div>
             );
           })}
