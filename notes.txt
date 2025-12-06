@@ -1,7 +1,5 @@
 change render order for login button
 
-make score text grey
-make hide completed change colors instead
 move logout/sync top right
 make padding between rows bigger
 area icons

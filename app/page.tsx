@@ -19,24 +19,55 @@ type Tower = {
 };
 
 const areas = [
-  'Ring 0', 'Ring 1', 'Ring 2',  'Ring 3', 'Ring 4', 'Ring 5', 'Ring 6', 'Ring 7', 'Ring 8', 'Ring 9',
+  'Ring 0', 'Ring 1', 'Ring 2', 'Ring 3', 'Ring 4', 'Ring 5', 'Ring 6', 'Ring 7', 'Ring 8', 'Ring 9',
   'Zone 1', 'Zone 2', 'Zone 3', 'Zone 4', 'Zone 5', 'Zone 6', 'Zone 7', 'Zone 8', 'Zone 9', 'Zone 10',
-  'Arcane Area', 'Ashen Towerworks', 'Forgotten Ridge', 'Garden of Eeshöl', 'Lost River', 
+  'Arcane Area', 'Ashen Towerworks', 'Forgotten Ridge', 'Garden of Eeshöl', 'Lost River',
   'Paradise Atoll', 'Silent Abyss', 'The Starlit Archives'
 ];
 
+const areaAcronyms: { [key: string]: string } = {
+  "Ring 0": "R0",
+  "Ring 1": "R1",
+  "Ring 2": "R2",
+  "Ring 3": "R3",
+  "Ring 4": "R4",
+  "Ring 5": "R5",
+  "Ring 6": "R6",
+  "Ring 7": "R7",
+  "Ring 8": "R8",
+  "Ring 9": "R9",
+  "Zone 1": "Z1",
+  "Zone 2": "Z2",
+  "Zone 3": "Z3",
+  "Zone 4": "Z4",
+  "Zone 5": "Z5",
+  "Zone 6": "Z6",
+  "Zone 7": "Z7",
+  "Zone 8": "Z8",
+  "Zone 9": "Z9",
+  "Zone 10": "Z10",
+  "Arcane Area": "AA",
+  "Ashen Towerworks": "AT",
+  "Forgotten Ridge": "FR",
+  "Garden of Eeshöl": "GoE",
+  "Lost River": "LR",
+  "Paradise Atoll": "PA",
+  "Silent Abyss": "SA",
+  "The Starlit Archives": "TSA"
+};
+
 const diffColors: { [key: string]: string } = {
-  easy: "#59b338ff",           
-  medium: "#c5c502ff",       
-  hard: "#b17000ff",           
-  difficult: "#cc3e3eff",      
-  challenging: "#720000ff",    
-  intense: "#000000",        
-  remorseless: "#a70096ff",    
-  insane: "#0000FF",         
-  extreme: "#0389FF",        
-  terrifying: "#00b4b4ff",     
-  catastrophic: "#FFFFFF"    
+  easy: "#59b338ff",
+  medium: "#c5c502ff",
+  hard: "#b17000ff",
+  difficult: "#cc3e3eff",
+  challenging: "#720000ff",
+  intense: "#000000",
+  remorseless: "#a70096ff",
+  insane: "#0000FF",
+  extreme: "#0389FF",
+  terrifying: "#00b4b4ff",
+  catastrophic: "#FFFFFF"
 };
 
 function getTowerImageUrl(towerName: string) {
@@ -118,7 +149,7 @@ export default function Home() {
     const params = new URLSearchParams(window.location.search);
     const access = params.get('access');
     const refresh = params.get('refresh');
-    
+
     if (access && refresh) {
       localStorage.setItem('access_token', access);
       window.dispatchEvent(new Event('storage'));
@@ -165,7 +196,7 @@ export default function Home() {
 
   return (
     <>
-      <MainHeader isAuthenticated={isAuthenticated}/>
+      <MainHeader isAuthenticated={isAuthenticated} />
       <FilterBar
         areas={areas}
         setSelectedAreas={setSelectedAreas}
@@ -187,11 +218,21 @@ export default function Home() {
             const isCompleted = completedTowers.includes(tower.id);
             return (
               <div key={tower.id} className="relative flex flex-col">
-                <img src={getTowerImageUrl(tower.name)} alt={tower.name} className={`h-90 w-full object-cover block mx-auto rounded-lg shadow-lg mb-2` + (isCompleted ? " ring-2 ring-green-400" : "")}/>
+                <img src={getTowerImageUrl(tower.name)} alt={tower.name} className={`h-90 w-full object-cover block mx-auto rounded-lg shadow-lg mb-2` + (isCompleted ? " ring-2 ring-green-400" : "")} />
+                <div className="absolute bottom-14 left-0 w-14 h-14 flex items-center justify-center">
+                  <div className="w-14 h-14 border-2 border-white rounded-md flex items-center justify-center bg-black">
+                    <img
+                      src={getTowerAreaImage(tower.area)}
+                      className="w-12 h-12 rounded"
+                      alt={tower.area}
+                    />
+                  </div>
+                  <span className="absolute text-xl font-bold text-white text-outline">
+                    {areaAcronyms[tower.area]}
+                  </span>
+                </div>
                 <div style={{ backgroundColor: diffColors[tower.diff_category] || "#fff" }} className="absolute bottom-14 right-0 w-14 h-14 rounded-md border-2 border-white shadow z-10 flex items-center justify-center" >
-                  <img src={getTowerAreaImage(tower.area)}>
-                  </img>
-                  <span className="right-0.5 text-xl font-bold text-white text-outline ">
+                  <span className="right-0.5 text-xl font-bold text-white text-outline">
                     {getTowerDifficultyWord(tower)}
                   </span>
                 </div>
