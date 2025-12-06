@@ -39,7 +39,7 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+notes.txt
 
 
 /db_backups/
-notes.txt

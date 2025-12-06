@@ -213,7 +213,7 @@ export default function Home() {
         hasMore={hasMore}
         loader={<h4>Loading...</h4>}
       >
-        <div className="grid grid-cols-6 gap-2.5 p-5">
+        <div className="grid grid-cols-6 gap-15 p-14">
           {towers.map((tower) => {
             const isCompleted = completedTowers.includes(tower.id);
             return (

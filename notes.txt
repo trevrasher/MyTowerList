@@ -1,5 +1,0 @@
-change render order for login button
-
-move logout/sync top right
-make padding between rows bigger
-area icons
