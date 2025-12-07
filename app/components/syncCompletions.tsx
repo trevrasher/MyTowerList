@@ -1,13 +1,19 @@
 "use client"
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8000";
 const COOLDOWN_MS = 60 * 1000;
+const LAST_SYNC_KEY = "last_sync_time";
 
 export default function SyncButton() {
   const [syncing, setSyncing] = useState(false);
   const [message, setMessage] = useState('');
   const [lastSync, setLastSync] = useState<number | null>(null);
+
+  useEffect(() => {
+    const stored = localStorage.getItem(LAST_SYNC_KEY);
+    if (stored) setLastSync(Number(stored));
+  }, []);
 
   const handleSync = async () => {
     const now = Date.now();
@@ -39,6 +45,7 @@ export default function SyncButton() {
       if (response.ok) {
         setMessage(`Synced ${data.newly_completed_count} new towers!`);
         setLastSync(now);
+        localStorage.setItem(LAST_SYNC_KEY, String(now));
         window.location.reload();
       } else {
         setMessage(`Error: ${data.error || 'Failed to sync'}`);
