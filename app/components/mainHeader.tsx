@@ -7,16 +7,16 @@ interface MainHeaderProps {
 
 export default function MainHeader({ isAuthenticated }: MainHeaderProps) {
     return (
-        <div className="w-full h-15 gray-500 relative bg-zinc-900 p-2 mb-10">
-            <div className="flex justify-center">
-                <span className="text-4xl mx-5">MyTowerList</span>
-                
-                <div className="absolute top-2.5 right-14">
-                    {isAuthenticated && <SyncButton />}
+        <div className="w-full h-15 bg-zinc-900 p-2 mb-10">
+            <div className="w-[95vw] mx-auto flex items-center justify-between">
+                <div className="flex-1 flex justify-end">
+                </div>
+                <span className="text-4xl mx-5 flex-shrink-0">MyTowerList</span>
+                <div className="flex-1 flex justify-end space-x-4">
+                    {true && <SyncButton />}
                     <LoginButton />
                 </div>
             </div>
         </div>
-
     )
 }
