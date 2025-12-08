@@ -9,7 +9,7 @@ export default function CompletedFilter ({completedToggle, setCompletedToggle} :
 
     return (
         <div>
-            <label className="flex items-center cursor-pointer w-40 py-4 bg-zinc-700 text-white rounded hover:bg-zinc-400 transition">
+            <label className="flex items-center cursor-pointer w-40 h-15 py-4 bg-zinc-700 text-white rounded hover:bg-zinc-400 transition">
                 <input
                 type = "checkbox"
                 checked = {completedToggle}

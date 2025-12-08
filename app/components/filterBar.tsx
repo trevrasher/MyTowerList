@@ -50,12 +50,12 @@ export default function FilterBar({
     return (
     <div className="flex justify-center items-center relative w-full">
         <div className="flex gap-x-4">
-          <div className="relative flex justify-center">
+          <div className="relative flex justify-center ">
             <SearchBar 
             onSearch={onSearch}
             />
               <button
-              className="w-30 bg-zinc-700 text-white rounded hover:bg-zinc-400 transition"
+              className="w-30 h-15 bg-zinc-700 text-white rounded hover:bg-zinc-400 transition"
               onClick={() => setFilterSelect("difficulty")}
               >
               Difficulty
@@ -74,7 +74,7 @@ export default function FilterBar({
           </div>
         <div className="relative flex justify-center">
             <button
-            className="w-30 py-4 bg-zinc-700 text-white rounded hover:bg-zinc-400 transition"
+            className="w-30 h-15 bg-zinc-700 text-white rounded hover:bg-zinc-400 transition"
             onClick={() => setFilterSelect("areas")}
             >
             Areas
@@ -93,12 +93,12 @@ export default function FilterBar({
             </div>
             )}
         </div> 
-        {isAuthenticated &&     
-          <CompletedFilter
-          completedToggle={completedToggle}
-          setCompletedToggle={setCompletedToggle}
-          />
-        }
+          {isAuthenticated &&     
+            <CompletedFilter
+            completedToggle={completedToggle}
+            setCompletedToggle={setCompletedToggle}
+            />
+          }
         </div>
 
     </div>
