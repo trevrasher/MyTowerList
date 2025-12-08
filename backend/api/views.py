@@ -160,3 +160,13 @@ class GetEligibleAreas(APIView):
                 data.append(area.name)
         return Response(data)
     
+class GetUserProfile(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        profile = request.user.profile
+        return Response({
+            "roblox_user_id": profile.roblox_user_id,
+            "username": request.user.username,
+        })
+    

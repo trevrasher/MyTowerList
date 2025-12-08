@@ -3,8 +3,8 @@ import React, { useEffect, useState } from "react";
 import FilterBar from "./components/filterBar";
 import MainHeader from "./components/mainHeader";
 import InfiniteScroll from 'react-infinite-scroll-component';
+import { API_BASE_URL } from "@/next.config";
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8000";
 
 type Tower = {
   id: number;
