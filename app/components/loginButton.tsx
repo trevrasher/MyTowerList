@@ -10,7 +10,7 @@ export default function LoginButton() {
    useEffect(() => {
     const checkToken = () => {
       const token = localStorage.getItem('access_token');
-      setIsLoggedIn(!!token);
+      setIsLoggedIn(!!token && token !== "undefined");
     };
 
     checkToken(); 
