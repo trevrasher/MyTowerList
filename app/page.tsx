@@ -4,6 +4,7 @@ import FilterBar from "./components/filterBar";
 import MainHeader from "./components/mainHeader";
 import InfiniteScroll from 'react-infinite-scroll-component';
 import { API_BASE_URL } from "@/next.config";
+import { refreshAccessToken } from "./utils/auth";
 
 
 type Tower = {
@@ -108,7 +109,7 @@ function buildQueryParams(
     params.append("exclude_completed", "true");
     completedTowers.forEach(id => params.append("completed_ids", id.toString()));
   }
-  return params.toString();
+  return `${API_BASE_URL}/api/towers/?${params.toString}`;
 }
 
 export default function Home() {
@@ -129,7 +130,6 @@ export default function Home() {
     setNextUrl(url);
     setHasMore(true);
     fetchTowersPage(url, true);
-    console.log("Search query:", query);
   };
 
   useEffect(() => {
@@ -173,10 +173,31 @@ export default function Home() {
     }
   }, []);
 
+
+
   const fetchTowersPage = async (url: string | null, reset = false) => {
     if (!url) return;
     setLoading(true);
-    const res = await fetch(url);
+
+    const getToken = () => localStorage.getItem('access_token');
+
+    let res = await fetch(url, {
+      headers: {
+        'Authorization': `Bearer ${getToken()}`,
+        'Content-Type': 'application/json'
+      }
+    });
+
+    if (res.status === 401) {
+      await refreshAccessToken();
+      res = await fetch(url, {
+        headers: {
+          'Authorization': `Bearer ${getToken()}`,
+          'Content-Type': 'application/json'
+        }
+      });
+    }
+
     const data = await res.json();
     setTowers(prev => reset ? (data.results || []) : [...prev, ...(data.results || [])]);
     setNextUrl(data.next);
@@ -184,14 +205,11 @@ export default function Home() {
     setLoading(false);
   };
 
-  function getInitialUrl() {
-    const query = buildQueryParams(selectedAreas, difficultyRange, completedToggle, completedTowers);
-    return `${API_BASE_URL}/api/towers/?${query}`;
-  }
+
 
   useEffect(() => {
     setTowers([]);
-    const url = getInitialUrl();
+    const url = buildQueryParams(selectedAreas, difficultyRange, completedToggle, completedTowers);
     setNextUrl(url);
     setHasMore(true);
     fetchTowersPage(url, true);

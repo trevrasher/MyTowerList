@@ -90,7 +90,6 @@ def roblox_callback(request):
             }
         )
         
-        # Get or create Profile for this user
         profile, profile_created = Profile.objects.get_or_create(
             user=user,
             defaults={
@@ -98,7 +97,6 @@ def roblox_callback(request):
             }
         )
         
-        # Update Roblox user ID if it changed
         if not profile_created and profile.roblox_user_id != roblox_id:
             profile.roblox_user_id = roblox_id
             profile.save()
