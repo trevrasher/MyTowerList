@@ -47,9 +47,6 @@ class TowerListView(generics.ListAPIView):
         return queryset
 
 
-
-    
-
 class GetAllTowersByScore(generics.ListAPIView):
     queryset = Tower.objects.select_related('area', 'badge').prefetch_related('creators_m2m').all().order_by('-score')
     serializer_class = TowerSerializer

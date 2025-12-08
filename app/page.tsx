@@ -179,24 +179,7 @@ export default function Home() {
     if (!url) return;
     setLoading(true);
 
-    const getToken = () => localStorage.getItem('access_token');
-
-    let res = await fetch(url, {
-      headers: {
-        'Authorization': `Bearer ${getToken()}`,
-        'Content-Type': 'application/json'
-      }
-    });
-
-    if (res.status === 401) {
-      await refreshAccessToken();
-      res = await fetch(url, {
-        headers: {
-          'Authorization': `Bearer ${getToken()}`,
-          'Content-Type': 'application/json'
-        }
-      });
-    }
+    let res = await fetch(url)
 
     const data = await res.json();
     setTowers(prev => reset ? (data.results || []) : [...prev, ...(data.results || [])]);
