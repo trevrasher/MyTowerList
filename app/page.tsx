@@ -109,7 +109,7 @@ function buildQueryParams(
     params.append("exclude_completed", "true");
     completedTowers.forEach(id => params.append("completed_ids", id.toString()));
   }
-  return `${API_BASE_URL}/api/towers/?${params.toString}`;
+  return `${API_BASE_URL}/api/towers/?${params.toString()}`;
 }
 
 export default function Home() {
