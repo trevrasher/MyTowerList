@@ -34,7 +34,19 @@ class TowerListView(generics.ListAPIView):
         completed_ids = self.request.query_params.getlist('completed_ids')
         if exclude_completed == "true" and completed_ids:
             queryset = queryset.exclude(id__in=completed_ids)
+
+        search = self.request.query_params.get('search')
+        if search:
+            search=search.strip().lower()
+            def get_acronym(name):
+                return ''.join([w[0] for w in name.split()]).lower()
+            queryset = [tower for tower in queryset if
+                        search in tower.name.lower() or
+                        search in get_acronym(tower.name)]
+            
         return queryset
+
+
 
     
 
@@ -147,3 +159,4 @@ class GetEligibleAreas(APIView):
             if eligible:
                 data.append(area.name)
         return Response(data)
+    

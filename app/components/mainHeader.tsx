@@ -13,7 +13,7 @@ export default function MainHeader({ isAuthenticated }: MainHeaderProps) {
                 </div>
                 <span className="text-4xl mx-5 flex-shrink-0">MyTowerList</span>
                 <div className="flex-1 flex justify-end space-x-4">
-                    {true && <SyncButton />}
+                    {isAuthenticated && <SyncButton />}
                     <LoginButton />
                 </div>
             </div>

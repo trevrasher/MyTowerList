@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from "react";
 import DifficultyFilter from "./difficultyFilter";
 import AreaFilter from "./areaFilter";
 import CompletedFilter from "./completedFilter";
+import SearchBar from "./searchBar";
 
 
 
@@ -14,6 +15,7 @@ interface FilterBarProps {
   completedToggle: boolean
   setCompletedToggle: (values: boolean) => void;
   isAuthenticated: boolean
+  onSearch: (query: string) => void;
 }
 
 
@@ -25,7 +27,8 @@ export default function FilterBar({
     setDifficultyRange,
     completedToggle,
     setCompletedToggle,
-    isAuthenticated
+    isAuthenticated,
+    onSearch
     }: FilterBarProps) {
 
     const [filterSelect, setFilterSelect] = useState<String>("");
@@ -48,6 +51,9 @@ export default function FilterBar({
     <div className="flex justify-center items-center relative w-full">
         <div className="flex gap-x-4">
           <div className="relative flex justify-center">
+            <SearchBar 
+            onSearch={onSearch}
+            />
               <button
               className="w-30 bg-zinc-700 text-white rounded hover:bg-zinc-400 transition"
               onClick={() => setFilterSelect("difficulty")}

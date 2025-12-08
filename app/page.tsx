@@ -78,7 +78,6 @@ function getTowerImageUrl(towerName: string) {
 
 function getTowerAreaImage(towerArea: string) {
   const fileName = towerArea.replace(/ /g, "").replace(/ö/g, "o") + ".webp";
-  console.log(fileName);
   return `https://raw.githubusercontent.com/trevrasher/MyTowerList/refs/heads/master/assets/area_thumbnails/${fileName}`;
 }
 
@@ -122,6 +121,16 @@ export default function Home() {
   const [completedToggle, setCompletedToggle] = useState<boolean>(false);
   const [difficultyRange, setDifficultyRange] = useState<number[]>([1, 12]);
   const [loading, setLoading] = useState(false);
+
+  const handleSearch = (query: string) => {
+    const baseQuery = buildQueryParams(selectedAreas, difficultyRange, completedToggle, completedTowers);
+    const url = `${API_BASE_URL}/api/towers/?${baseQuery}&search=${encodeURIComponent(query)}`
+    setTowers([]);
+    setNextUrl(url);
+    setHasMore(true);
+    fetchTowersPage(url, true);
+    console.log("Search query:", query);
+  };
 
   useEffect(() => {
     if (!isAuthenticated) return;
@@ -206,6 +215,7 @@ export default function Home() {
         completedToggle={completedToggle}
         setCompletedToggle={setCompletedToggle}
         isAuthenticated={isAuthenticated}
+        onSearch={handleSearch}
       />
       <InfiniteScroll
         dataLength={towers.length}
