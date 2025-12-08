@@ -26,7 +26,7 @@ export default function MainHeader({ isAuthenticated }: MainHeaderProps) {
     }, [isAuthenticated]);
 
     return (
-        <div className="w-full h-15 bg-zinc-900 p-2 mb-10">
+        <div className="w-full h-18 bg-zinc-900 p-2 mb-10">
             <div className="w-[95vw] mx-auto flex items-center justify-between">
                 <div className="flex-1 flex justify-end">
                 </div>
@@ -36,9 +36,8 @@ export default function MainHeader({ isAuthenticated }: MainHeaderProps) {
                     <LoginButton />
                 </div>
                 {isAuthenticated &&
-                    <div>
-                        {avatarUrl && (<img src={avatarUrl} alt="Roblox Avatar" />)}
-                        <span>{robloxUsername}</span>
+                    <div className="ml-8">
+                        {avatarUrl && <img src={avatarUrl} alt="Roblox Avatar" className="w-15 h-15 border-2 rounded-md" />}
                     </div>
                 }
             </div>
