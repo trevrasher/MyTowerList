@@ -165,8 +165,19 @@ class GetUserProfile(APIView):
 
     def get(self, request):
         profile = request.user.profile
+        roblox_user_id = profile.roblox_user_id
+        avatar_url = None
+
+        if roblox_user_id:
+            resp = requests.get(
+                f"https://thumbnails.roblox.com/v1/users/avatar-headshot?userIds={roblox_user_id}&size=150x150&format=Png&isCircular=false"
+            )
+            data = resp.json()
+            if data.get("data") and data["data"][0].get("imageUrl"):
+                avatar_url = data["data"][0]["imageUrl"]
+
         return Response({
-            "roblox_user_id": profile.roblox_user_id,
+            "roblox_user_id": roblox_user_id,
             "username": request.user.username,
+            "avatar_url": avatar_url
         })
-    

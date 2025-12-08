@@ -7,10 +7,8 @@ interface MainHeaderProps {
     isAuthenticated: boolean;
 }
 
-type User = { username: string; roblox_user_id: string };
-
 export default function MainHeader({ isAuthenticated }: MainHeaderProps) {
-    const [robloxUserId, setRobloxUserId] = useState<string | null>(null);
+    const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
     const [robloxUsername, setRobloxUsername] = useState<string | null>(null);
 
     useEffect(() => {
@@ -20,9 +18,9 @@ export default function MainHeader({ isAuthenticated }: MainHeaderProps) {
                 headers: { "Authorization": `Bearer ${localStorage.getItem("access_token")}` }
             })
                 .then(res => res.json())
-                .then((user: User) => {
-                    setRobloxUserId(user.roblox_user_id);
-                    setRobloxUsername(user.username);
+                .then((res) => {
+                    setRobloxUsername(res.username);
+                    setAvatarUrl(res.avatar_url || null);
                 });
         }
     }, [isAuthenticated]);
@@ -39,8 +37,8 @@ export default function MainHeader({ isAuthenticated }: MainHeaderProps) {
                 </div>
                 {isAuthenticated &&
                     <div>
-                        <img src={`https://thumbnails.roblox.com/v1/users/avatar-headshot?userIds=${robloxUserId}&size=150x150&format=Png&isCircular=false`} alt="Roblox Avatar" />
-                        <span>Logged in as {robloxUsername}</span>
+                        {avatarUrl && (<img src={avatarUrl} alt="Roblox Avatar" />)}
+                        <span>{robloxUsername}</span>
                     </div>
                 }
             </div>
