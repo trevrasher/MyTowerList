@@ -82,6 +82,8 @@ class Profile(models.Model):
     complete_towers = models.ManyToManyField('Tower', blank = True)
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile', null=True)
     roblox_user_id = models.BigIntegerField(unique=True, null=True, blank=True)
+    reviewed_towers = models.ManyToManyField('Tower', through='TowerReview', related_name='reviews', blank=True)
+    ignored_towers = models.ManyToManyField('Tower', related_name='ignored_by', blank=True)
 
     def __str__(self):
         return f"{self.user.username}'s Profile"
@@ -115,6 +117,14 @@ class Profile(models.Model):
             'newly_completed_count': newly_completed.count()
         }
         
+class TowerReview(models.Model):
+    profile = models.ForeignKey('Profile', on_delete=models.CASCADE)
+    tower = models.ForeignKey('Tower', on_delete=models.CASCADE)
+    score = models.PositiveSmallIntegerField(validators=[MinValueValidator(0), MaxValueValidator(100)])
+    review_text = models.TextField(blank=True, null=True)  
+
+    class Meta:
+        unique_together = ('profile', 'tower')
 
 
         
