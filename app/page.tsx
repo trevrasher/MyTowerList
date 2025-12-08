@@ -4,7 +4,7 @@ import FilterBar from "./components/filterBar";
 import MainHeader from "./components/mainHeader";
 import InfiniteScroll from 'react-infinite-scroll-component';
 import { API_BASE_URL } from "@/next.config";
-import { refreshAccessToken } from "./utils/auth";
+import { fetchWithAuth } from "./utils/auth";
 
 
 type Tower = {
@@ -132,28 +132,20 @@ export default function Home() {
     fetchTowersPage(url, true);
   };
 
+  //completed towers check
   useEffect(() => {
     if (!isAuthenticated) return;
-    const token = localStorage.getItem('access_token');
-    if (token) {
-      fetch(`${API_BASE_URL}/api/profile/completed-towers/`, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
+    fetchWithAuth(`${API_BASE_URL}/api/profile/completed-towers/`)
+      .then((data) => {
+        const ids = data.map((item: any) => item.id);
+        setCompletedTowers(ids);
       })
-        .then((res) => {
-          if (!res.ok) throw new Error('Failed to fetch');
-          return res.json();
-        })
-        .then((data) => {
-          const ids = data.map((item: any) => item.id);
-          setCompletedTowers(ids);
-        })
-        .catch((error) => console.error('Error:', error));
-    }
+      .catch((error) => {
+        console.error('Error fetching completed towers:', error);
+      });
   }, [isAuthenticated]);
 
+  //auth
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const access = params.get('access');
@@ -173,6 +165,15 @@ export default function Home() {
     }
   }, []);
 
+  //filtering
+  useEffect(() => {
+    setTowers([]);
+    const url = buildQueryParams(selectedAreas, difficultyRange, completedToggle, completedTowers);
+    setNextUrl(url);
+    setHasMore(true);
+    fetchTowersPage(url, true);
+  }, [selectedAreas, difficultyRange, completedToggle, completedTowers]);
+
 
 
   const fetchTowersPage = async (url: string | null, reset = false) => {
@@ -190,13 +191,7 @@ export default function Home() {
 
 
 
-  useEffect(() => {
-    setTowers([]);
-    const url = buildQueryParams(selectedAreas, difficultyRange, completedToggle, completedTowers);
-    setNextUrl(url);
-    setHasMore(true);
-    fetchTowersPage(url, true);
-  }, [selectedAreas, difficultyRange, completedToggle, completedTowers]);
+
 
   const fetchMoreTowers = () => {
     if (nextUrl && !loading) {
