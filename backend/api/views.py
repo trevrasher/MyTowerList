@@ -178,3 +178,7 @@ class GetUserProfile(APIView):
             "username": request.user.username,
             "avatar_url": avatar_url
         })
+    
+class HealthCheck(APIView):
+    def get(self, request):
+        return Response({"status": "ok"}, status=status.HTTP_200_OK)
