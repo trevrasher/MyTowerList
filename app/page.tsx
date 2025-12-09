@@ -5,6 +5,7 @@ import MainHeader from "./components/mainHeader";
 import InfiniteScroll from 'react-infinite-scroll-component';
 import { API_BASE_URL } from "@/next.config";
 import { fetchWithAuth } from "./utils/auth";
+import Link from 'next/link';
 
 
 type Tower = {
@@ -223,28 +224,30 @@ export default function Home() {
           {towers.map((tower) => {
             const isCompleted = completedTowers.includes(tower.id);
             return (
-              <div key={tower.id} className="relative flex flex-col">
-                <img src={getTowerImageUrl(tower.name)} alt={tower.name} className={`h-90 w-full object-cover block mx-auto rounded-lg shadow-lg mb-2` + (isCompleted ? " ring-2 ring-green-400" : "")} />
-                <div className="absolute bottom-14 left-0 w-14 h-14 flex items-center justify-center">
-                  <div className="w-14 h-14 border-2 border-white rounded-md flex items-center justify-center bg-black">
-                    <img
-                      src={getTowerAreaImage(tower.area)}
-                      className="w-12 h-12 rounded"
-                      alt={tower.area}
-                    />
+              <Link href={`/towers/${tower.name}`} key={tower.id}>
+                <div className="relative flex flex-col cursor-pointer hover:opacity-90 transition">
+                  <img src={getTowerImageUrl(tower.name)} alt={tower.name} className={`h-90 w-full object-cover block mx-auto rounded-lg shadow-lg mb-2` + (isCompleted ? " ring-2 ring-green-400" : "")} />
+                  <div className="absolute bottom-14 left-0 w-14 h-14 flex items-center justify-center">
+                    <div className="w-14 h-14 border-2 border-white rounded-md flex items-center justify-center bg-black">
+                      <img
+                        src={getTowerAreaImage(tower.area)}
+                        className="w-12 h-12 rounded"
+                        alt={tower.area}
+                      />
+                    </div>
+                    <span className="absolute text-xl font-bold text-white text-outline">
+                      {areaAcronyms[tower.area]}
+                    </span>
                   </div>
-                  <span className="absolute text-xl font-bold text-white text-outline">
-                    {areaAcronyms[tower.area]}
-                  </span>
+                  <div style={{ backgroundColor: diffColors[tower.diff_category] || "#fff" }} className="absolute bottom-14 right-0 w-14 h-14 rounded-md border-2 border-white shadow z-10 flex items-center justify-center" >
+                    <span className="right-0.5 text-xl font-bold text-white text-outline">
+                      {getTowerDifficultyWord(tower)}
+                    </span>
+                  </div>
+                  <strong className="whitespace-nowrap max-w-full overflow-hidden text-ellipsis" >{tower.name}</strong>
+                  <span className="whitespace-nowrap max-w-full overflow-hidden text-ellipsis text-zinc-500">Score: {tower.score}</span>
                 </div>
-                <div style={{ backgroundColor: diffColors[tower.diff_category] || "#fff" }} className="absolute bottom-14 right-0 w-14 h-14 rounded-md border-2 border-white shadow z-10 flex items-center justify-center" >
-                  <span className="right-0.5 text-xl font-bold text-white text-outline">
-                    {getTowerDifficultyWord(tower)}
-                  </span>
-                </div>
-                <strong className="whitespace-nowrap max-w-full overflow-hidden text-ellipsis" >{tower.name}</strong>
-                <span className="whitespace-nowrap max-w-full overflow-hidden text-ellipsis text-zinc-500">Score: {tower.score}</span>
-              </div>
+              </Link>
             );
           })}
         </div>
