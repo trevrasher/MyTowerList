@@ -26,8 +26,8 @@ export default function MainHeader({ isAuthenticated }: MainHeaderProps) {
     }, [isAuthenticated]);
 
     return (
-        <div className="w-full h-18 bg-zinc-900 p-2 mb-10">
-            <div className="w-[95vw] mx-auto flex items-center justify-between">
+        <div className="w-full h-18 bg-zinc-900  mb-10">
+            <div className="w-[95vw] h-18 mx-auto flex items-center justify-between">
                 <div className="flex-1 flex justify-end">
                 </div>
                 <span className="text-4xl mx-5 flex-shrink-0">MyTowerList</span>
