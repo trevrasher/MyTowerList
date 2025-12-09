@@ -50,10 +50,11 @@ export default function FilterBar({
     return (
     <div className="flex justify-center items-center relative w-full">
         <div className="flex gap-x-4">
-          <div className="relative flex justify-center ">
-            <SearchBar 
+          <SearchBar 
             onSearch={onSearch}
             />
+          <div className="relative flex justify-center ">
+            
               <button
               className="w-30 h-15 bg-zinc-700 text-white rounded hover:bg-zinc-400 transition"
               onClick={() => setFilterSelect("difficulty")}
