@@ -5,13 +5,12 @@ export default async function TowerPage({
 }: { 
   params: { name: string } 
 }) {
-  // Decode the URL parameter in case it has special characters
-  const towerName = decodeURIComponent(params.name);
+  const { name } = await params;
+  const towerName = decodeURIComponent(name);
   
   try {
     const res = await fetch(
       `${API_BASE_URL}/api/towers/${encodeURIComponent(towerName)}/`,
-      { cache: 'no-store' } // Disable caching for development
     );
     
     if (!res.ok) {
@@ -29,6 +28,7 @@ export default async function TowerPage({
       </div>
     );
   } catch (error) {
+    console.log(error)
     return (
       <div>
         <h1>Error loading tower</h1>
