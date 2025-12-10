@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import LoginButton from "./loginButton"
 import SyncButton from "./syncCompletions"
 import { API_BASE_URL } from "@/next.config";
+import Link from "next/link";
 
 interface MainHeaderProps {
     isAuthenticated: boolean;
@@ -30,7 +31,9 @@ export default function MainHeader({ isAuthenticated }: MainHeaderProps) {
             <div className="w-[95vw] h-18 mx-auto flex items-center justify-between">
                 <div className="flex-1 flex justify-end">
                 </div>
-                <span className="text-4xl mx-5 flex-shrink-0">MyTowerList</span>
+                <Link href="/" className="text-4xl mx-5 flex-shrink-0 cursor-pointer hover:opacity-80 transition">
+                    MyTowerList
+                </Link>
                 <div className="flex-1 flex justify-end space-x-4">
                     {isAuthenticated && <SyncButton />}
                     <LoginButton />
