@@ -4,6 +4,7 @@ import MainHeader from "@/app/components/mainHeader";
 import { useAuth } from "@/app/hooks/useAuth";
 import { useEffect, useState } from "react";
 import { getTowerImageUrl, getTowerAreaImage, diffColors, getTowerDifficultyWord, Tower } from "@/app/utils/towers";
+import { fetchWithAuth } from "@/app/utils/auth";
 
 
 
@@ -40,21 +41,19 @@ export default function TowerPage({
     fetchTower();
   }, [params]);
 
-  useEffect(() => {
-    async function fetchTowerCompletion() {
-      if (!tower || !isAuthenticated) return;
-      const res = await fetch(`${API_BASE_URL}/api/towers/${tower.id}/completion/`);
-
-      if (!res.ok) {
-        setError(`Failed to fetch tower completion: ${res.status}`)
-        return;
-      }
-
-      const data = await res.json();
+useEffect(() => {
+  async function fetchTowerCompletion() {
+    if (!tower || !isAuthenticated) return;
+    
+    try {
+      const data = await fetchWithAuth(`${API_BASE_URL}/api/towers/${tower.id}/completion/`);
       setIsCompleted(data);
+    } catch (error) {
+      setError(`Failed to fetch tower completion: ${error}`)
     }
-    fetchTowerCompletion()
-  }, [tower, isAuthenticated]);
+  }
+  fetchTowerCompletion()
+}, [tower, isAuthenticated]);
 
 
   if (error) return <div>{error}</div>;
