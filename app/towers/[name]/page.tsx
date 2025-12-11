@@ -15,7 +15,7 @@ export default function TowerPage({
 }) {
   const [tower, setTower] = useState<Tower | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [isCompleted, setIsCompleted] = useState<boolean>(false);
+  const [isCompleted, setIsCompleted] = useState<boolean | null>(null);
   const isAuthenticated = useAuth();
   const [dropdownOpen, setDropdownOpen] = useState(false);
 
@@ -41,19 +41,20 @@ export default function TowerPage({
     fetchTower();
   }, [params]);
 
-useEffect(() => {
-  async function fetchTowerCompletion() {
-    if (!tower || !isAuthenticated) return;
-    
-    try {
-      const data = await fetchWithAuth(`${API_BASE_URL}/api/towers/${tower.id}/completion/`);
-      setIsCompleted(data);
-    } catch (error) {
-      setError(`Failed to fetch tower completion: ${error}`)
+  useEffect(() => {
+    async function fetchTowerCompletion() {
+      if (!tower || !isAuthenticated) return;
+
+      try {
+        const data = await fetchWithAuth(`${API_BASE_URL}/api/towers/${tower.id}/completion/`);
+        setIsCompleted(data.completed);
+        console.log(isCompleted);
+      } catch (error) {
+        setError(`Failed to fetch tower completion: ${error}`)
+      }
     }
-  }
-  fetchTowerCompletion()
-}, [tower, isAuthenticated]);
+    fetchTowerCompletion()
+  }, [tower, isAuthenticated]);
 
 
   if (error) return <div>{error}</div>;
@@ -70,12 +71,15 @@ useEffect(() => {
         <div className="absolute left-0 right-0 top-0 mx-auto w-[60vw] z-10 mt-20 flex items-start">
           <div className="flex flex-col items-center">
             <img src={getTowerImageUrl(tower.name)} className="h-120 w-80 object-cover rounded-lg shadow-lg border-3" />
-            <button
+            {isCompleted && <div className="bg-green-600 h-15 w-80 mt-4 rounded-lg border-1 flex items-center justify-center">
+              <span className="mx-auto my-auto text-2xl text-outline">Complete</span>
+            </div>}
+            {isCompleted == false && <button
               className="bg-zinc-600 h-15 w-80 mt-4 rounded-lg border-1 flex items-center justify-center hover:bg-zinc-500 cursor-pointer"
               onClick={() => setDropdownOpen((open) => !open)}
             >
               <span className="mx-auto my-auto text-2xl text-outline">Incomplete</span>
-            </button>
+            </button>}
             {dropdownOpen && (
               <div className="flex flex-col bg-zinc-600 border rounded-lg shadow-lg mt-1 w-50 py-4 h-28">
                 <button className="hover:bg-zinc-500 cursor-pointer h-10 text-xl">Set as Planned</button>
