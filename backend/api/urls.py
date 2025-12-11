@@ -15,5 +15,5 @@ urlpatterns = [
     path('profile/available-areas/', GetEligibleAreas.as_view(), name = 'get-avail'),
     path('profile/', GetUserProfile.as_view(), name = 'get-current-user'),
     path('health/', HealthCheck.as_view(), name='health-check'),
-    path('towers/{towerName}/completion/', GetTowerCompletion.as_view(), name='tower-completion')
+    path('towers/<int:tower_id>}/completion/', GetTowerCompletion.as_view(), name='tower-completion')
 ]
