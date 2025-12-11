@@ -1,14 +1,14 @@
 "use client"
-import React, { useEffect, useState } from "react";
+import { API_BASE_URL } from "@/next.config";
+import Link from 'next/link';
+import { useEffect, useState, useRef } from "react";
+import InfiniteScroll from 'react-infinite-scroll-component';
+import AreaIcon from "./components/areaIcon";
 import FilterBar from "./components/filterBar";
 import MainHeader from "./components/mainHeader";
-import InfiniteScroll from 'react-infinite-scroll-component';
-import { API_BASE_URL } from "@/next.config";
-import { fetchWithAuth } from "./utils/auth";
-import Link from 'next/link';
 import { useAuth } from "./hooks/useAuth";
-import { Tower, areas, areaAcronyms, diffColors, getTowerImageUrl, getTowerAreaImage, getTowerDifficultyWord } from "./utils/towers";
-import AreaIcon from "./components/areaIcon";
+import { fetchWithAuth } from "./utils/auth";
+import { Tower, areas, diffColors, getTowerDifficultyWord, getTowerImageUrl } from "./utils/towers";
 
 
 function buildQueryParams(
@@ -40,6 +40,7 @@ export default function Home() {
   const [completedToggle, setCompletedToggle] = useState<boolean>(false);
   const [difficultyRange, setDifficultyRange] = useState<number[]>([1, 12]);
   const [loading, setLoading] = useState(false);
+  const completedTowersLoaded = useRef(false);
 
   const handleSearch = (query: string) => {
     const baseQuery = buildQueryParams(selectedAreas, difficultyRange, completedToggle, completedTowers);
@@ -52,19 +53,25 @@ export default function Home() {
 
   //completed towers check
   useEffect(() => {
-    if (!isAuthenticated) return;
+    if (!isAuthenticated) {
+      completedTowersLoaded.current = true;
+      return;
+    }
     fetchWithAuth(`${API_BASE_URL}/api/profile/completed-towers/`)
       .then((data) => {
         const ids = data.map((item: any) => item.id);
         setCompletedTowers(ids);
+        completedTowersLoaded.current = true;
       })
       .catch((error) => {
         console.error('Error fetching completed towers:', error);
+        completedTowersLoaded.current = true;
       });
   }, [isAuthenticated]);
 
   //filtering
   useEffect(() => {
+    if (!completedTowersLoaded.current) return;
     setTowers([]);
     const url = buildQueryParams(selectedAreas, difficultyRange, completedToggle, completedTowers);
     setNextUrl(url);
@@ -124,7 +131,7 @@ export default function Home() {
               <Link href={`/towers/${tower.name}`} key={tower.id}>
                 <div className="relative flex flex-col cursor-pointer hover:opacity-90 transition">
                   <img src={getTowerImageUrl(tower.name)} alt={tower.name} className={`h-90 w-full object-cover block mx-auto rounded-lg shadow-lg mb-2` + (isCompleted ? " ring-2 ring-green-400" : "")} />
-                  <AreaIcon tower={tower}/>
+                  <AreaIcon tower={tower} />
                   <div style={{ backgroundColor: diffColors[tower.diff_category] || "#fff" }} className="absolute bottom-14 right-0 w-14 h-14 rounded-md border-2 border-white shadow z-10 flex items-center justify-center" >
                     <span className="right-0.5 text-xl font-bold text-white text-outline">
                       {getTowerDifficultyWord(tower)}
