@@ -40,7 +40,7 @@ export default function Home() {
   const [completedToggle, setCompletedToggle] = useState<boolean>(false);
   const [difficultyRange, setDifficultyRange] = useState<number[]>([1, 12]);
   const [loading, setLoading] = useState(false);
-  const completedTowersLoaded = useRef(false);
+  const [completedTowersLoaded, setCompletedTowersLoaded] = useState<boolean>(false);
 
   const handleSearch = (query: string) => {
     const baseQuery = buildQueryParams(selectedAreas, difficultyRange, completedToggle, completedTowers);
@@ -54,24 +54,24 @@ export default function Home() {
   //completed towers check
   useEffect(() => {
     if (!isAuthenticated) {
-      completedTowersLoaded.current = true;
+      setCompletedTowersLoaded(true);
       return;
     }
     fetchWithAuth(`${API_BASE_URL}/api/profile/completed-towers/`)
       .then((data) => {
         const ids = data.map((item: any) => item.id);
         setCompletedTowers(ids);
-        completedTowersLoaded.current = true;
+        setCompletedTowersLoaded(true);
       })
       .catch((error) => {
         console.error('Error fetching completed towers:', error);
-        completedTowersLoaded.current = true;
+        setCompletedTowersLoaded(true);
       });
   }, [isAuthenticated]);
 
   //filtering
   useEffect(() => {
-    if (!completedTowersLoaded.current) return;
+    if (completedTowersLoaded) return;
     setTowers([]);
     const url = buildQueryParams(selectedAreas, difficultyRange, completedToggle, completedTowers);
     setNextUrl(url);
