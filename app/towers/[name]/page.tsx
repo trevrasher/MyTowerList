@@ -3,7 +3,7 @@ import { API_BASE_URL } from "@/next.config";
 import MainHeader from "@/app/components/mainHeader";
 import { useAuth } from "@/app/hooks/useAuth";
 import { useEffect, useState } from "react";
-import { getTowerImageUrl, getTowerAreaImage, diffColors, getTowerDifficultyWord, Tower } from "@/app/utils/towers";
+import { getTowerImageUrl, getTowerAreaImage, diffColors, getTowerDifficultyWord, Tower, getTowerAreaBanner} from "@/app/utils/towers";
 import { fetchWithAuth } from "@/app/utils/auth";
 
 
@@ -66,7 +66,7 @@ export default function TowerPage({
 
       <div className="relative w-full h-100">
 
-        <img src="https://raw.githubusercontent.com/trevrasher/MyTowerList/refs/heads/master/assets/area_banners/Ring1.png" className="w-full h-full object-cover" ></img>
+        <img src={getTowerAreaBanner(tower.area)} className="w-full h-full object-cover" ></img>
         <div className="absolute inset-0 bg-black opacity-50"></div>
         <div className="absolute left-0 right-0 top-0 mx-auto w-[60vw] z-10 mt-20 flex items-start">
           <div className="flex flex-col items-center">
