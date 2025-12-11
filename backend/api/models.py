@@ -86,44 +86,44 @@ class Profile(models.Model):
     def __str__(self):
         return f"{self.user.username}'s Profile"
     
-def sync_tower_completions(self):
-    completed_tower_ids = self.tower_statuses.filter(status='completed').values_list('tower_id', flat=True)
-    uncompleted_towers = Tower.objects.exclude(id__in=completed_tower_ids).filter(badge__isnull=False)
+    def sync_tower_completions(self):
+        completed_tower_ids = self.tower_statuses.filter(status='completed').values_list('tower_id', flat=True)
+        uncompleted_towers = Tower.objects.exclude(id__in=completed_tower_ids).filter(badge__isnull=False)
 
-    if not uncompleted_towers.exists():
-        return {'newly_completed': [], 'total_checked': 0, 'newly_completed_count': 0}
+        if not uncompleted_towers.exists():
+            return {'newly_completed': [], 'total_checked': 0, 'newly_completed_count': 0}
 
-    badge_ids = list(uncompleted_towers.values_list('badge__id', flat=True))
-    owned_badge_ids = []
-    for i in range(0, len(badge_ids), 100):
-        batch = badge_ids[i:i+100]
-        badge_ids_str = ','.join([str(bid) for bid in batch])
+        badge_ids = list(uncompleted_towers.values_list('badge__id', flat=True))
+        owned_badge_ids = []
+        for i in range(0, len(badge_ids), 100):
+            batch = badge_ids[i:i+100]
+            badge_ids_str = ','.join([str(bid) for bid in batch])
 
-        try:
-            response = requests.get(
-                f'https://badges.roblox.com/v1/users/{self.roblox_user_id}/badges/awarded-dates',
-                params={'badgeIds': badge_ids_str}
+            try:
+                response = requests.get(
+                    f'https://badges.roblox.com/v1/users/{self.roblox_user_id}/badges/awarded-dates',
+                    params={'badgeIds': badge_ids_str}
+                )
+                response.raise_for_status()
+                data = response.json()
+                owned_badge_ids.extend([item['badgeId'] for item in data.get('data', [])])
+            except requests.RequestException as e:
+                return {'error': str(e)}
+
+        newly_completed = uncompleted_towers.filter(badge__id__in=owned_badge_ids)
+
+        for tower in newly_completed:
+            ProfileTowerStatus.objects.update_or_create(
+                profile=self,
+                tower=tower,
+                defaults={'status': 'completed'}
             )
-            response.raise_for_status()
-            data = response.json()
-            owned_badge_ids.extend([item['badgeId'] for item in data.get('data', [])])
-        except requests.RequestException as e:
-            return {'error': str(e)}
 
-    newly_completed = uncompleted_towers.filter(badge__id__in=owned_badge_ids)
-
-    for tower in newly_completed:
-        ProfileTowerStatus.objects.update_or_create(
-            profile=self,
-            tower=tower,
-            defaults={'status': 'completed'}
-        )
-
-    return {
-        'newly_completed': list(newly_completed.values('id', 'name')),
-        'total_checked': uncompleted_towers.count(),
-        'newly_completed_count': newly_completed.count()
-    }
+        return {
+            'newly_completed': list(newly_completed.values('id', 'name')),
+            'total_checked': uncompleted_towers.count(),
+            'newly_completed_count': newly_completed.count()
+        }
         
 class TowerReview(models.Model):
     profile = models.ForeignKey('Profile', on_delete=models.CASCADE)
