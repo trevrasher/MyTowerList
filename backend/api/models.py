@@ -18,18 +18,19 @@ class Area(models.Model):
     def __str__(self):
         return self.name
     
-    def check_requirements(self, profile):
-        completed = profile.complete_towers
-        
-        if completed.count() < self.required_completions:
+def check_requirements(self, profile):
+    completed_statuses = profile.tower_statuses.filter(status='completed')
+    completed_towers = Tower.objects.filter(id__in=completed_statuses.values_list('tower_id', flat=True))
+
+    if completed_towers.count() < self.required_completions:
+        return False
+    
+    for diff_category, required_count in self.required_difficulties.items():
+        actual = completed_towers.filter(diff_category=diff_category).count()
+        if actual < required_count:
             return False
 
-        for diff_category, required_count in self.required_difficulties.items():
-            actual = completed.filter(diff_category=diff_category).count()
-            if actual < required_count:
-                return False
-        
-        return True
+    return True
     
 
 class Tower(models.Model):
@@ -79,49 +80,70 @@ class Badge(models.Model):
 
 
 class Profile(models.Model):
-    complete_towers = models.ManyToManyField('Tower', blank = True)
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile', null=True)
     roblox_user_id = models.BigIntegerField(unique=True, null=True, blank=True)
-    reviewed_towers = models.ManyToManyField('Tower', through='TowerReview', related_name='reviews', blank=True)
-    ignored_towers = models.ManyToManyField('Tower', related_name='ignored_by', blank=True)
 
     def __str__(self):
         return f"{self.user.username}'s Profile"
     
-    def sync_tower_completions(self):
-        uncompleted_towers = Tower.objects.exclude(id__in=self.complete_towers.all()).filter(badge__isnull=False) 
-   
-        if not uncompleted_towers.exists():
-            return {'newly_completed': [], 'total_checked': 0}
-            
-        badge_ids = list(uncompleted_towers.values_list('badge__id', flat=True))
-        owned_badge_ids = []
-        for i in range(0, len(badge_ids), 100):
-            batch = badge_ids[i:i+100]
-            badge_ids_str = ','.join([str(bid) for bid in batch])
-        
-            try:
-                response = requests.get(f'https://badges.roblox.com/v1/users/{self.roblox_user_id}/badges/awarded-dates', params={'badgeIds': badge_ids_str})
-                response.raise_for_status()
-                data = response.json()
-                owned_badge_ids.extend([item['badgeId'] for item in data.get('data', [])])
-            except requests.RequestException as e:
-                return {'error': str(e)}
-        newly_completed = uncompleted_towers.filter(badge__id__in=owned_badge_ids)
+def sync_tower_completions(self):
+    completed_tower_ids = self.tower_statuses.filter(status='completed').values_list('tower_id', flat=True)
+    uncompleted_towers = Tower.objects.exclude(id__in=completed_tower_ids).filter(badge__isnull=False)
 
-        self.complete_towers.add(*newly_completed)
+    if not uncompleted_towers.exists():
+        return {'newly_completed': [], 'total_checked': 0, 'newly_completed_count': 0}
 
-        return {
-            'newly_completed': list(newly_completed.values('id', 'name')),
-            'total_checked': uncompleted_towers.count(),
-            'newly_completed_count': newly_completed.count()
-        }
+    badge_ids = list(uncompleted_towers.values_list('badge__id', flat=True))
+    owned_badge_ids = []
+    for i in range(0, len(badge_ids), 100):
+        batch = badge_ids[i:i+100]
+        badge_ids_str = ','.join([str(bid) for bid in batch])
+
+        try:
+            response = requests.get(
+                f'https://badges.roblox.com/v1/users/{self.roblox_user_id}/badges/awarded-dates',
+                params={'badgeIds': badge_ids_str}
+            )
+            response.raise_for_status()
+            data = response.json()
+            owned_badge_ids.extend([item['badgeId'] for item in data.get('data', [])])
+        except requests.RequestException as e:
+            return {'error': str(e)}
+
+    newly_completed = uncompleted_towers.filter(badge__id__in=owned_badge_ids)
+
+    for tower in newly_completed:
+        ProfileTowerStatus.objects.update_or_create(
+            profile=self,
+            tower=tower,
+            defaults={'status': 'completed'}
+        )
+
+    return {
+        'newly_completed': list(newly_completed.values('id', 'name')),
+        'total_checked': uncompleted_towers.count(),
+        'newly_completed_count': newly_completed.count()
+    }
         
 class TowerReview(models.Model):
     profile = models.ForeignKey('Profile', on_delete=models.CASCADE)
     tower = models.ForeignKey('Tower', on_delete=models.CASCADE)
     score = models.PositiveSmallIntegerField(validators=[MinValueValidator(0), MaxValueValidator(100)])
     review_text = models.TextField(blank=True, null=True)  
+
+    class Meta:
+        unique_together = ('profile', 'tower')
+
+
+class ProfileTowerStatus(models.Model):
+    STATUS_CHOICES = [
+        ('completed', 'Completed'),
+        ('bookmarked', 'Bookmarked'),
+        ('ignored', 'Ignored'),
+    ]
+    profile = models.ForeignKey('Profile', on_delete=models.CASCADE, related_name='tower_statuses')
+    tower = models.ForeignKey('Tower', on_delete=models.CASCADE, related_name='profile_statuses')
+    status = models.CharField(max_length=10, choices=STATUS_CHOICES)
 
     class Meta:
         unique_together = ('profile', 'tower')

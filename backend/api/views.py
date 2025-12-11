@@ -122,9 +122,10 @@ class SyncTowerCompletions(APIView):
 class GetCompletedTowers(APIView):
     permission_classes = [IsAuthenticated]
 
-    def get (self, request):
+    def get(self, request):
         profile = request.user.profile
-        completed_towers = profile.complete_towers.select_related('area', 'badge').prefetch_related('creators_m2m').all().values('id')
+        completed_tower_ids = profile.tower_statuses.filter(status='completed').values_list('tower_id', flat=True)
+        completed_towers = Tower.objects.filter(id__in=completed_tower_ids).select_related('area', 'badge').prefetch_related('creators_m2m').values('id')
         return Response(list(completed_towers))
     
 class GetEligibleAreas(APIView):
@@ -132,7 +133,8 @@ class GetEligibleAreas(APIView):
     def get(self, request):
         profile = request.user.profile
         areas = Area.objects.all()
-        completed = profile.complete_towers.all()
+        completed_tower_ids = profile.tower_statuses.filter(status='completed').values_list('tower_id', flat=True)
+        completed = Tower.objects.filter(id__in=completed_tower_ids)
         diff_counts = {}
         for tower in completed:
             cat = tower.diff_category
@@ -140,7 +142,7 @@ class GetEligibleAreas(APIView):
 
         data = []
         print("User:", request.user)
-        print("Completed towers:", profile.complete_towers.count())
+        print("Completed towers:", completed.count())
         print("Areas:", areas.count())
         print("Diff counts:", diff_counts)
         for area in areas:
@@ -188,5 +190,5 @@ class GetTowerCompletion(APIView):
 
     def get(self, request, tower_id):
         profile = request.user.profile
-        completed = profile.complete_towers.filter(id=tower_id).exists()
+        completed = profile.tower_statuses.filter(tower_id=tower_id, status='completed').exists()
         return Response({"completed": completed})
