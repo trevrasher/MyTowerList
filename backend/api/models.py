@@ -112,12 +112,11 @@ class Profile(models.Model):
 
         newly_completed = uncompleted_towers.filter(badge__id__in=owned_badge_ids)
 
-        for tower in newly_completed:
-            ProfileTowerStatus.objects.update_or_create(
-                profile=self,
-                tower=tower,
-                defaults={'status': 'completed'}
-            )
+        status_objects = [
+            ProfileTowerStatus(profile=self, tower=tower, status='completed')
+            for tower in newly_completed
+        ]
+        ProfileTowerStatus.objects.bulk_create(status_objects, ignore_conflicts=True)
 
         return {
             'newly_completed': list(newly_completed.values('id', 'name')),
