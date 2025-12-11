@@ -182,3 +182,11 @@ class GetUserProfile(APIView):
 class HealthCheck(APIView):
     def get(self, request):
         return Response({"status": "ok"}, status=status.HTTP_200_OK)
+
+class GetTowerCompletion(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, tower_id):
+        profile = request.user.profile
+        completed = profile.complete_towers.filter(tower_id).exists()
+        return Response(completed)
