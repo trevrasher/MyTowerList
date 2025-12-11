@@ -188,5 +188,5 @@ class GetTowerCompletion(APIView):
 
     def get(self, request, tower_id):
         profile = request.user.profile
-        completed = profile.complete_towers.filter(tower_id).exists()
-        return Response(completed)
+        completed = profile.complete_towers.filter(id=tower_id).exists()
+        return Response({"completed": completed})
