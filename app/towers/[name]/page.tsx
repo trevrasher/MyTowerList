@@ -3,7 +3,7 @@ import { API_BASE_URL } from "@/next.config";
 import MainHeader from "@/app/components/mainHeader";
 import { useAuth } from "@/app/hooks/useAuth";
 import { useEffect, useState } from "react";
-import { getTowerImageUrl, getTowerAreaImage, diffColors, getTowerDifficultyWord, Tower, getTowerAreaBanner} from "@/app/utils/towers";
+import { getTowerImageUrl, getTowerAreaImage, diffColors, getTowerDifficultyWord, Tower, getTowerAreaBanner } from "@/app/utils/towers";
 import { fetchWithAuth } from "@/app/utils/auth";
 
 
@@ -37,8 +37,10 @@ export default function TowerPage({
 
       const data = await res.json();
       setTower(data);
+          console.log('Creators:', data.creators);
     }
     fetchTower();
+    
   }, [params]);
 
   useEffect(() => {
@@ -107,9 +109,43 @@ export default function TowerPage({
                 {getTowerDifficultyWord(tower)} {tower.diff_category.charAt(0).toUpperCase() + tower.diff_category.slice(1)} ({tower.difficulty})
               </span>
             </div>
-
-
-
+            <div className="mt-6">
+              <span className="ml-18 text-white text-3xl text-outline">{tower.score} / 100</span>
+            </div>
+            <div className="flex mt-20">
+              <div className="h-80 w-100 bg-zinc-900 border-white border-2 rounded-md">
+                <div className="w-full h-10 flex justify-between items-center px-4 border-b border-white">
+                  <span className="text-xl text-outline">Reviews</span>
+                  <button className="bg-zinc-700 px-2 py-1 rounded-md hover:bg-zinc-500">Write a Review</button>
+                </div>
+              </div>
+              <div className="h-80 w-70 bg-zinc-900 ml-10 border-white border-2 rounded-md">
+                <div className="w-full flex flex-col px-4 border-b border-white h-10 justify-center">
+                  <span className="text-xl text-outline">Creators</span>
+                </div>
+                <div className="h-65 overflow-y-auto pt-2 pl-2">
+                  {tower.creators.map((creator, index) => (
+                    creator.roblox_user_id ? (
+                      <a
+                        key={index}
+                        href={`https://www.roblox.com/users/${creator.roblox_user_id}/profile`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="pb-2 flex items-center hover:bg-zinc-800 rounded-md px-2 transition cursor-pointer"
+                      >
+                        {creator.avatar_url && <img src={creator.avatar_url} className="h-16 w-16 border-2 border-white rounded-md" />}
+                        <span className="pl-2 text-l text-outline">{creator.name}</span>
+                      </a>
+                    ) : (
+                      <div key={index} className="pb-2 flex items-center px-2">
+                        {creator.avatar_url && <img src={creator.avatar_url} className="h-16 w-16 border-2 border-white rounded-md" />}
+                        <span className="pl-2 text-l text-outline">{creator.name}</span>
+                      </div>
+                    )
+                  ))}
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 
