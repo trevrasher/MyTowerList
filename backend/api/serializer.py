@@ -9,4 +9,4 @@ class TowerSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
     def get_creators(self, obj):
-        return ", ".join([creator.name for creator in obj.creators_m2m.all()])
+        return [creator.name for creator in obj.creators_m2m.all()]
