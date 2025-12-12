@@ -69,6 +69,9 @@ class Tower(models.Model):
 
 class Creator(models.Model):
     name = models.CharField(max_length=100, unique=True)
+    roblox_user_id = models.BigIntegerField(null=True, blank=True)
+    avatar_url = models.URLField(null=True, blank=True)
+
     
 
     def __str__(self):
