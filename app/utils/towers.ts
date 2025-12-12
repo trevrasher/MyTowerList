@@ -3,12 +3,18 @@ export type Tower = {
   id: number;
   name: string;
   difficulty: number;
-  creators: string[]
+  creators: Creator[]; 
   floors: number;
   area: string;
   score: number;
   type: 'tower' | 'mini_tower' | 'steeple' | 'citadel';
   diff_category: string;
+};
+
+export type Creator = {
+  name: string;
+  roblox_user_id: number | null;
+  avatar_url: string | null;
 };
 
 export const areas = [
