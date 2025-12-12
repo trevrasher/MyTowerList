@@ -10,18 +10,25 @@ interface MainHeaderProps {
 
 export default function MainHeader({ isAuthenticated }: MainHeaderProps) {
     const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
-    const [robloxUsername, setRobloxUsername] = useState<string | null>(null);
 
     useEffect(() => {
         if (isAuthenticated) {
+            const cachedAvatar = localStorage.getItem("avatar_url");
+            if (cachedAvatar) {
+                setAvatarUrl(cachedAvatar);
+                return;
+            }
             fetch(`${API_BASE_URL}/api/profile`, {
                 credentials: "include",
                 headers: { "Authorization": `Bearer ${localStorage.getItem("access_token")}` }
             })
                 .then(res => res.json())
                 .then((res) => {
-                    setRobloxUsername(res.username);
-                    setAvatarUrl(res.avatar_url || null);
+                    const url = res.avatar_url || null;
+                    setAvatarUrl(url);
+                    if (url) {
+                        localStorage.setItem("avatar_url", url);
+                    }
                 });
         }
     }, [isAuthenticated]);
