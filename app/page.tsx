@@ -130,7 +130,7 @@ export default function Home() {
             return (
               <Link href={`/towers/${tower.name}`} key={tower.id}>
                 <div className="relative flex flex-col cursor-pointer hover:opacity-90 transition">
-                  <img src={getTowerImageUrl(tower.name)} alt={tower.name} className={`h-90 w-full object-cover block mx-auto rounded-lg shadow-lg mb-2` + (isCompleted ? " ring-2 ring-green-400" : "")} />
+                  <img src={getTowerImageUrl(tower.name)} alt={tower.name} className={`h-90 w-full object-cover block mx-auto rounded-lg shadow-lg mb-2` + (isCompleted ? " ring-4 ring-green-400" : "")} />
                   <AreaIcon tower={tower} />
                   <div style={{ backgroundColor: diffColors[tower.diff_category] || "#fff" }} className="absolute bottom-14 right-0 w-14 h-14 rounded-md border-2 border-white shadow z-10 flex items-center justify-center" >
                     <span className="right-0.5 text-xl font-bold text-white text-outline">
