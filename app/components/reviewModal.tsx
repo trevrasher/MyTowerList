@@ -10,7 +10,7 @@ interface ReviewModalProps {
 export default function ReviewModal({ onClose, towerId }: ReviewModalProps) {
     const [review, setReview] = useState("");
     const [summary, setSummary] = useState("");
-    const [score, setScore] = useState(50);
+    const [score, setScore] = useState<number | "">(50);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
@@ -20,6 +20,18 @@ export default function ReviewModal({ onClose, towerId }: ReviewModalProps) {
 
     const handleSummaryChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setSummary(e.target.value);
+    };
+
+    const handleScore = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const inputValue = e.target.value;
+        
+        if (inputValue === "") {
+            setScore("");
+            return;
+        }
+        
+        const value = Math.max(0, Math.min(100, Number(inputValue)));
+        setScore(value);
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -36,7 +48,7 @@ export default function ReviewModal({ onClose, towerId }: ReviewModalProps) {
                 body: JSON.stringify({
                     review,
                     summary,
-                    score
+                    score: score === "" ? 0 : score
                 })
             });
 
@@ -70,19 +82,23 @@ export default function ReviewModal({ onClose, towerId }: ReviewModalProps) {
                         maxLength={1500}
                         className="w-full h-75 px-4 py-2 rounded border border-zinc-400 mt-2 mb-2 resize-none"
                     />
-                    <span className="text-stroke text-xl mt-4">Review Summary</span>
+                    <div className="flex justify-between items-center mt-2">
+                        <span className="text-stroke text-xl">Review Summary</span>
+                        <span className="text-sm text-gray-400">{summary.length}/80</span>
+                    </div>
                     <input type="text" value={summary} onChange={handleSummaryChange} placeholder="Write a summary..."
+                        maxLength={80}
                         className="w-full h-10 px-4 rounded border border-zinc-400 mb-2 mt-2" />
                     <span className="text-stroke text-xl">Score</span>
                     <div className="flex justify-between items-center mt-2">
-                        <input type="number" value={score} onChange={(e) => setScore(Number(e.target.value))}
+                        <input type="number" value={score} onChange={(e) => handleScore(e)}
                             min="0"
                             max="100"
                             className="w-16 h-10 px-2 rounded border border-zinc-400 text-center text-lg [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                         />
                         <button
                             onClick={handleSubmit}
-                            disabled={isSubmitting || !review.trim() || !summary.trim()}
+                            disabled={isSubmitting || !review.trim() || !summary.trim() || score === ""}
                             className="bg-blue-600 px-6 py-2 rounded hover:bg-blue-500 transition disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                             {isSubmitting ? 'Submitting...' : 'Submit Review'}

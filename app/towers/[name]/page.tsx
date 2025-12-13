@@ -73,7 +73,7 @@ export default function TowerPage({
 
         <img src={getTowerAreaBanner(tower.area)} className="w-full h-full object-cover" ></img>
         <div className="absolute inset-0 bg-black opacity-50"></div>
-        <div className="absolute left-0 right-0 top-0 mx-auto w-[60vw] z-10 mt-20 flex items-start">
+        <div className="absolute left-0 right-0 top-0 mx-auto w-[60vw] z-10 mt-20 flex items-start justify-center">
           <div className="flex flex-col items-center">
             <img src={getTowerImageUrl(tower.name)} className="h-120 w-80 object-cover rounded-lg shadow-lg border-3" />
             {isCompleted && <div className="bg-green-600 h-15 w-80 mt-4 rounded-lg border-1 flex items-center justify-center">
