@@ -71,13 +71,13 @@ export default function Home() {
 
   //filtering
   useEffect(() => {
-    if (completedTowersLoaded) return;
+    if (!completedTowersLoaded) return;
     setTowers([]);
     const url = buildQueryParams(selectedAreas, difficultyRange, completedToggle, completedTowers);
     setNextUrl(url);
     setHasMore(true);
     fetchTowersPage(url, true);
-  }, [selectedAreas, difficultyRange, completedToggle, completedTowers]);
+  }, [selectedAreas, difficultyRange, completedToggle, completedTowers, completedTowersLoaded]);
 
 
 
