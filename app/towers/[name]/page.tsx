@@ -5,6 +5,7 @@ import { useAuth } from "@/app/hooks/useAuth";
 import { useEffect, useState } from "react";
 import { getTowerImageUrl, getTowerAreaImage, diffColors, getTowerDifficultyWord, Tower, getTowerAreaBanner } from "@/app/utils/towers";
 import { fetchWithAuth } from "@/app/utils/auth";
+import ReviewModal from "@/app/components/reviewModal";
 
 
 
@@ -18,6 +19,8 @@ export default function TowerPage({
   const [isCompleted, setIsCompleted] = useState<boolean | null>(null);
   const isAuthenticated = useAuth();
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [reviewWindow, setReviewWindow] = useState(false);
+
 
 
 
@@ -37,10 +40,10 @@ export default function TowerPage({
 
       const data = await res.json();
       setTower(data);
-          console.log('Creators:', data.creators);
+      console.log('Creators:', data.creators);
     }
     fetchTower();
-    
+
   }, [params]);
 
   useEffect(() => {
@@ -116,7 +119,7 @@ export default function TowerPage({
               <div className="h-80 w-100 bg-zinc-900 border-white border-2 rounded-md">
                 <div className="w-full h-10 flex justify-between items-center px-4 border-b border-white">
                   <span className="text-xl text-outline">Reviews</span>
-                  <button className="bg-zinc-700 px-2 py-1 rounded-md hover:bg-zinc-500">Write a Review</button>
+                  {isAuthenticated && isCompleted && <button className="bg-zinc-700 px-2 py-1 rounded-md hover:bg-zinc-500" onClick={() => setReviewWindow(true)}>Write a Review</button>}
                 </div>
               </div>
               <div className="h-80 w-70 bg-zinc-900 ml-10 border-white border-2 rounded-md">
@@ -150,6 +153,12 @@ export default function TowerPage({
         </div>
 
       </div>
+      {reviewWindow && (
+        <ReviewModal 
+          onClose={() => setReviewWindow(false)}
+          towerId={tower.id}
+        />
+      )}
     </>
   );
 }
