@@ -49,7 +49,7 @@ export default function FilterBar({
     
     return (
     <div className="flex justify-center items-center relative w-full">
-        <div className="flex gap-x-4">
+        <div className="flex flex-col sm:flex-row gap-4">
           <SearchBar 
             onSearch={onSearch}
             />
@@ -64,7 +64,7 @@ export default function FilterBar({
               {filterSelect == "difficulty" && (
               <div
                   ref={filterRef}
-                  className="absolute -translate-x-1/2 left-1/2 top-6/7 shadow-lg bg-zinc-900 rounded-lg p-2 w-96 z-50 mt-5"
+                  className="absolute -translate-x-1/2 left-1/2 top-6/7 shadow-lg bg-zinc-900 rounded-lg p-2 w-70 md:w-96 z-50 mt-5"
               >
                   <DifficultyFilter
                   difficultyRange={difficultyRange}
@@ -83,7 +83,7 @@ export default function FilterBar({
             {filterSelect == "areas" && (
             <div
                 ref={filterRef}
-                className="absolute -translate-x-1/2 left-1/2 top-6/7 translate-y-1/27 shadow-lg bg-zinc-900 rounded-lg p-2 w-85 z-50"
+                className="absolute -translate-x-1/2 left-1/2 top-6/7 translate-y-1/27 shadow-lg bg-zinc-900 rounded-lg p-2 w-70 md:w-85 z-50"
             >
                 <AreaFilter
                 selectedAreas={selectedAreas}

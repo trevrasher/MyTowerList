@@ -36,17 +36,15 @@ export default function MainHeader({ isAuthenticated }: MainHeaderProps) {
     return (
         <div className="w-full h-18 bg-zinc-900  mb-10">
             <div className="w-[95vw] h-18 mx-auto flex items-center justify-between">
-                <div className="flex-1 flex justify-end">
-                </div>
-                <Link href="/" className="text-4xl absolute mx-auto flex-shrink-0 cursor-pointer hover:opacity-80 transition text-outline">
+                <Link href="/" className="text-4xl absolute mx-auto flex-shrink-0 cursor-pointer hover:opacity-80 transition text-outline invisible md:visible ">
                     MyTowerList
                 </Link>
-                <div className="flex-1 flex justify-end space-x-4">
+                <div className="flex-1 flex justify-end ">
                     {isAuthenticated && <SyncButton />}
                     <LoginButton />
                 </div>
                 {isAuthenticated &&
-                    <div className="ml-8">
+                    <div className="ml-2 md:ml-4">
                         {avatarUrl && <img src={avatarUrl} alt="Roblox Avatar" className="w-15 h-15 border-2 rounded-md" />}
                     </div>
                 }

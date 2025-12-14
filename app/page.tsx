@@ -122,9 +122,13 @@ export default function Home() {
         dataLength={towers.length}
         next={fetchMoreTowers}
         hasMore={hasMore}
-        loader={<h4>Loading...</h4>}
+        loader={
+          <div className="flex justify-center py-8">
+            <h4 className="text-lg text-gray-600 dark:text-gray-400">Loading...</h4>
+          </div>
+        }
       >
-        <div className="grid grid-cols-6 gap-15 w-[95vw] my-10 mx-auto">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4 md:gap-6 lg:gap-8 w-[95vw] my-10 mx-auto">
           {towers.map((tower) => {
             const isCompleted = completedTowers.includes(tower.id);
             return (
