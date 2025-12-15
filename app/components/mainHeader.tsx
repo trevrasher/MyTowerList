@@ -36,7 +36,7 @@ export default function MainHeader({ isAuthenticated }: MainHeaderProps) {
     return (
         <div className="w-full h-18 bg-zinc-900  mb-10">
             <div className="w-[95vw] h-18 mx-auto flex items-center justify-between">
-                <Link href="/" className="text-4xl absolute mx-auto flex-shrink-0 cursor-pointer hover:opacity-80 transition text-outline invisible md:visible ">
+                <Link href="/" className="text-4xl absolute mx-auto flex-shrink-0 cursor-pointer hover:opacity-80 transition text-outline invisible sm:visible ">
                     MyTowerList
                 </Link>
                 <div className="flex-1 flex justify-end ">
