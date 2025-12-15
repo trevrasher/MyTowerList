@@ -69,13 +69,13 @@ export default function TowerPage({
     <>
       <MainHeader isAuthenticated={isAuthenticated} />
 
-      <div className="relative w-full h-100">
+      <div className="flex flex-col justify-center items-center md:relative w-full md:h-100">
 
-        <img src={getTowerAreaBanner(tower.area)} className="w-full h-full object-cover" ></img>
-        <div className="absolute inset-0 bg-black opacity-50"></div>
-        <div className="absolute left-0 right-0 top-0 mx-auto w-[60vw] z-10 mt-20 flex items-start justify-center">
+        <img src={getTowerAreaBanner(tower.area)} className="hidden md:block w-full h-full object-cover" ></img>
+        <div className="hidden md:block absolute inset-0 bg-black opacity-50"></div>
+        <div className="flex-col  md:absolute inset-0 md:mx-auto md:w-[60vw] z-10  md:mt-20 flex md:flex-row items-start justify-center">
           <div className="flex flex-col items-center">
-            <img src={getTowerImageUrl(tower.name)} className="h-120 w-80 object-cover rounded-lg shadow-lg border-3" />
+            <img src={getTowerImageUrl(tower.name)} className="h-60 w-60 md:h-120 md:w-80 object-cover rounded-lg shadow-lg border-3" />
             {isCompleted && <div className="bg-green-600 h-15 w-80 mt-4 rounded-lg border-1 flex items-center justify-center">
               <span className="mx-auto my-auto text-2xl text-outline">Complete</span>
             </div>}
@@ -92,9 +92,9 @@ export default function TowerPage({
               </div>
             )}
           </div>
-          <div className="ml-10">
-            <span className="text-4xl font-bold text-outline">{tower.name}</span>
-            <div className="flex items-center mt-10">
+          <div className="md:ml-10 mt-5 md:mt-0">
+            <span className="text-xl md:text-4xl font-bold text-outline">{tower.name}</span>
+            <div className="flex items-center mt-4 md:mt-10">
               <div className="w-14 h-14 flex items-center justify-center">
                 <div className="w-14 h-14 border-2 border-white rounded-md flex items-center justify-center bg-black">
                   <img
@@ -104,29 +104,29 @@ export default function TowerPage({
                   />
                 </div>
               </div>
-              <span className="ml-4 text-white text-3xl text-outline">{tower.area}</span>
+              <span className="ml-4 text-white text-2xl md:text-3xl text-outline">{tower.area}</span>
             </div>
             <div className="flex items-center mt-5">
               <div style={{ backgroundColor: diffColors[tower.diff_category] || "#fff" }} className="w-14 h-14 rounded-md border-2 border-white shadow z-10 flex items-center justify-center" />
-              <span className="ml-4 text-white text-3xl text-outline">
+              <span className="ml-4 text-white text-2xl md:text-3xl text-outline">
                 {getTowerDifficultyWord(tower)} {tower.diff_category.charAt(0).toUpperCase() + tower.diff_category.slice(1)} ({tower.difficulty})
               </span>
             </div>
             <div className="mt-6">
-              <span className="ml-18 text-white text-3xl text-outline">{tower.score} / 100</span>
+              <span className="ml-18 text-white text-2xl md:text-3xl text-outline">{tower.score} / 100</span>
             </div>
-            <div className="flex mt-20">
-              <div className="h-80 w-100 bg-zinc-900 border-white border-2 rounded-md">
+            <div className="flex flex-col md:flex-row mt-8 md:mt-20">
+              <div className="w-80 h-80 md:w-100 bg-zinc-900 border-white border-2 rounded-md">
                 <div className="w-full h-10 flex justify-between items-center px-4 border-b border-white">
                   <span className="text-xl text-outline">Reviews</span>
                   {isAuthenticated && isCompleted && <button className="bg-zinc-700 px-2 py-1 rounded-md hover:bg-zinc-500" onClick={() => setReviewWindow(true)}>Write a Review</button>}
                 </div>
               </div>
-              <div className="h-80 w-70 bg-zinc-900 ml-10 border-white border-2 rounded-md">
-                <div className="w-full flex flex-col px-4 border-b border-white h-10 justify-center">
-                  <span className="text-xl text-outline">Creators</span>
+              <div className="h-80 w-80 bg-zinc-900 md:ml-10 border-white border-2 rounded-md mt-8 md:mt-0 ">
+                <div className="w-full flex flex-col border-b border-white h-10 justify-center">
+                  <span className="text-xl px-4 text-outline">Creators</span>
                 </div>
-                <div className="h-65 overflow-y-auto pt-2 pl-2">
+                <div className="h-65 overflow-y-auto pt-2">
                   {tower.creators.map((creator, index) => (
                     creator.roblox_user_id ? (
                       <a
@@ -134,15 +134,15 @@ export default function TowerPage({
                         href={`https://www.roblox.com/users/${creator.roblox_user_id}/profile`}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="pb-2 flex items-center hover:bg-zinc-800 rounded-md px-2 transition cursor-pointer"
+                        className=" pl-4 py-2 flex items-center hover:bg-zinc-800 rounded-md transition cursor-pointer w-full"
                       >
                         {creator.avatar_url && <img src={creator.avatar_url} className="h-16 w-16 border-2 border-white rounded-md" />}
                         <span className="pl-2 text-l text-outline">{creator.name}</span>
                       </a>
                     ) : (
-                      <div key={index} className="pb-2 flex items-center px-2">
+                      <div key={index} className="pb-2 pl-4 flex items-center px-2">
                         {creator.avatar_url && <img src={creator.avatar_url} className="h-16 w-16 border-2 border-white rounded-md" />}
-                        <span className="pl-2 text-l text-outline">{creator.name}</span>
+                        <span className="pl-4 text-l text-outline">{creator.name}</span>
                       </div>
                     )
                   ))}
@@ -154,7 +154,7 @@ export default function TowerPage({
 
       </div>
       {reviewWindow && (
-        <ReviewModal 
+        <ReviewModal
           onClose={() => setReviewWindow(false)}
           towerId={tower.id}
         />

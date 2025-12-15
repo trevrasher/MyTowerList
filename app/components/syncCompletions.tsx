@@ -41,7 +41,7 @@ export default function SyncButton() {
       });
 
       const data = await response.json();
-      
+
       if (response.ok) {
         setMessage(`Synced ${data.newly_completed_count} new towers!`);
         setLastSync(now);
@@ -60,12 +60,13 @@ export default function SyncButton() {
 
   return (
     <div>
-      <button 
+      <button
         onClick={handleSync}
         disabled={syncing}
         className="bg-zinc-600 text-white px-4 py-2 rounded hover:bg-zinc-400 mx-1 md:mx-5"
       >
-        {message ? message : 'Sync Tower Completions'}
+        <span className="sm:hidden">{message ? message : 'Sync'}</span>
+        <span className="hidden sm:inline">{message ? message : 'Sync Tower Completions'}</span>
       </button>
     </div>
   );
