@@ -21,16 +21,11 @@ class ProfileSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Profile
-        fields = ['username', 'roblox_user_id', '']
+        fields = ['username', 'roblox_user_id', 'avatar_url']
 
 class TowerReviewSerializer(serializers.ModelSerializer):
-    username = serializers.SerializerMethodField()
+    profile = ProfileSerializer(read_only=True)
     
     class Meta:
         model = TowerReview
         fields = '__all__'
-    
-    def get_username(self, obj):
-        if obj.profile and obj.profile.user:
-            return obj.profile.user.username
-        return "Unknown User"

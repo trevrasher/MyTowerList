@@ -12,10 +12,8 @@ import InfiniteScroll from "react-infinite-scroll-component";
 
 interface Review {
   id: number;
-  profile: {
-    username: string;
-    roblox_user_id: number;
-  };
+  username: string;
+  roblox_user_id: number;
   score: number;
   review_text: string;
   summary: string;
@@ -99,12 +97,12 @@ export default function TowerPage({
   useEffect(() => {
     async function fetchReviews() {
       if (!tower) return;
-      
+
       try {
         const url = `${API_BASE_URL}/api/towers/${tower.id}/reviews/?limit=5`;
         const res = await fetch(url);
         const data = await res.json();
-        
+
         setReviews(data.results || []);
         setReviewsNextUrl(data.next);
         setHasMoreReviews(Boolean(data.next));
@@ -117,11 +115,11 @@ export default function TowerPage({
 
   const fetchMoreReviews = async () => {
     if (!reviewsNextUrl) return;
-    
+
     try {
       const res = await fetch(reviewsNextUrl);
       const data = await res.json();
-      
+
       setReviews(prev => [...prev, ...(data.results || [])]);
       setReviewsNextUrl(data.next);
       setHasMoreReviews(Boolean(data.next));
@@ -206,7 +204,7 @@ export default function TowerPage({
                   <span className="text-xl text-outline">Reviews</span>
                   {isAuthenticated && towerStatus == "completed" && <button className="bg-zinc-700 px-2 py-1 rounded-md hover:bg-zinc-500" onClick={() => setReviewWindow(true)}>Write a Review</button>}
                 </div>
-                
+
                 <div id="reviews-scrollable" className="h-65 overflow-y-auto">
                   <InfiniteScroll
                     dataLength={reviews.length}
@@ -218,14 +216,11 @@ export default function TowerPage({
                     {reviews.map((review) => (
                       <div key={review.id} className="p-4 border-b border-zinc-700">
                         <div className="flex items-center justify-between mb-2">
-                          <span className="font-bold text-outline">{review.profile.username}</span>
+                          <span className="font-bold text-outline">{review.username}</span>
                           <span className="text-yellow-500">{review.score}/100</span>
                         </div>
                         {review.summary && (
                           <p className="text-sm font-semibold mb-1 text-outline">{review.summary}</p>
-                        )}
-                        {review.review_text && (
-                          <p className="text-sm text-gray-300">{review.review_text}</p>
                         )}
                       </div>
                     ))}
