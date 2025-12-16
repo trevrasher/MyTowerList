@@ -190,5 +190,43 @@ class GetTowerCompletion(APIView):
 
     def get(self, request, tower_id):
         profile = request.user.profile
-        completed = profile.tower_statuses.filter(tower_id=tower_id, status='completed').exists()
-        return Response({"completed": completed})
+        tower_status = profile.tower_statuses.filter(tower_id=tower_id).first()
+        
+        if tower_status:
+            return Response({"status": tower_status.status})
+        else:
+            return Response({"status": None})
+    
+class SetTowerStatus(APIView):
+    permission_classes = [IsAuthenticated]
+    
+    def post(self, request, tower_id):
+        from .models import ProfileTowerStatus
+        
+        profile = request.user.profile
+        status_value = request.data.get('status')  
+        
+        valid_statuses = ['completed', 'bookmarked', 'ignored', 'incomplete']
+        if status_value not in valid_statuses:
+            return Response(
+                {'error': f'Invalid status. Must be one of: {valid_statuses}'}, 
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        try:
+            tower = Tower.objects.get(id=tower_id)
+        except Tower.DoesNotExist:
+            return Response(
+                {'error': 'Tower not found'}, 
+                status=status.HTTP_404_NOT_FOUND
+            )
+        
+        ProfileTowerStatus.objects.update_or_create(
+            profile=profile,
+            tower=tower,
+            defaults={'status': status_value}
+        )
+        
+        return Response({
+            'message': f'Tower status set to {status_value}',
+        })

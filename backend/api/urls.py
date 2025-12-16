@@ -1,6 +1,6 @@
 from django.urls import path
-from . import views, oauth
-from .views import GetAllTowersByScore, GetTowerByName, GetGameBadgesCSV, SyncTowerCompletions, GetCompletedTowers, GetEligibleAreas, TowerListView, GetUserProfile, HealthCheck, GetTowerCompletion
+from . import oauth
+from .views import  GetTowerByName, GetGameBadgesCSV, SyncTowerCompletions, GetCompletedTowers, GetEligibleAreas, TowerListView, GetUserProfile, HealthCheck, GetTowerCompletion, SetTowerStatus
 from rest_framework_simplejwt.views import TokenRefreshView
 urlpatterns = [
     path('auth/roblox/', oauth.roblox_login, name='roblox-login'),
@@ -15,5 +15,6 @@ urlpatterns = [
     path('profile/available-areas/', GetEligibleAreas.as_view(), name = 'get-avail'),
     path('profile/', GetUserProfile.as_view(), name = 'get-current-user'),
     path('health/', HealthCheck.as_view(), name='health-check'),
-    path('towers/<int:tower_id>/completion/', GetTowerCompletion.as_view(), name='tower-completion')
+    path('towers/<int:tower_id>/completion/', GetTowerCompletion.as_view(), name='tower-completion'),
+    path('towers/<int:tower_id>/status/', SetTowerStatus.as_view(), name='tower-status'),
 ]

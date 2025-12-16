@@ -16,13 +16,31 @@ export default function TowerPage({
 }) {
   const [tower, setTower] = useState<Tower | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [isCompleted, setIsCompleted] = useState<boolean | null>(null);
+  const [towerStatus, setTowerStatus] = useState<string | null>(null);
   const isAuthenticated = useAuth();
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [reviewWindow, setReviewWindow] = useState(false);
 
 
+  async function setStatus(status: string) {
+    if (!tower || !tower.id) {
+      console.error('Tower not loaded');
+      return;
+    }
 
+    try {
+      const data = await fetchWithAuth(`${API_BASE_URL}/api/towers/${tower.id}/status/`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ status }),
+      });
+    } catch (error) {
+      console.error('Error updating tower status:', error);
+      setError(`Failed to update tower status: ${error}`);
+    }
+  }
 
   useEffect(() => {
     async function fetchTower() {
@@ -49,11 +67,9 @@ export default function TowerPage({
   useEffect(() => {
     async function fetchTowerCompletion() {
       if (!tower || !isAuthenticated) return;
-
       try {
         const data = await fetchWithAuth(`${API_BASE_URL}/api/towers/${tower.id}/completion/`);
-        setIsCompleted(data.completed);
-        console.log(isCompleted);
+        setTowerStatus(data.status);
       } catch (error) {
         setError(`Failed to fetch tower completion: ${error}`)
       }
@@ -76,19 +92,35 @@ export default function TowerPage({
         <div className="flex-col  md:absolute inset-0 md:mx-auto md:w-[60vw] z-10  md:mt-20 flex md:flex-row items-start justify-center">
           <div className="flex flex-col items-center">
             <img src={getTowerImageUrl(tower.name)} className="h-60 w-60 md:h-120 md:w-80 object-cover rounded-lg shadow-lg border-3" />
-            {isCompleted && <div className="bg-green-600 h-15 w-80 mt-4 rounded-lg border-1 flex items-center justify-center">
+            {towerStatus=="completed" && <div className="bg-green-600 h-15 w-80 mt-4 rounded-lg border-1 flex items-center justify-center">
               <span className="mx-auto my-auto text-2xl text-outline">Complete</span>
             </div>}
-            {isCompleted == false && <button
+            {towerStatus == null && <button
               className="bg-zinc-600 h-15 w-80 mt-4 rounded-lg border-1 flex items-center justify-center hover:bg-zinc-500 cursor-pointer"
               onClick={() => setDropdownOpen((open) => !open)}
             >
-              <span className="mx-auto my-auto text-2xl text-outline">Incomplete</span>
+            
+               <span className="mx-auto my-auto text-2xl text-outline">Incomplete</span>
             </button>}
+            {towerStatus == "bookmarked" && <button
+              className="bg-red-800 h-15 w-80 mt-4 rounded-lg border-1 flex items-center justify-center hover:bg-zinc-500 cursor-pointer"
+              onClick={() => setDropdownOpen((open) => !open)}
+            >
+            
+               <span className="mx-auto my-auto text-2xl text-outline">Planned</span>
+            </button>}
+            {towerStatus == "ignored" && <button
+              className="bg-sky-800 h-15 w-80 mt-4 rounded-lg border-1 flex items-center justify-center hover:bg-zinc-500 cursor-pointer"
+              onClick={() => setDropdownOpen((open) => !open)}
+            >
+            
+               <span className="mx-auto my-auto text-2xl text-outline">Ignored</span>
+            </button>}
+            
             {dropdownOpen && (
               <div className="flex flex-col bg-zinc-600 border rounded-lg shadow-lg mt-1 w-50 py-4 h-28">
-                <button className="hover:bg-zinc-500 cursor-pointer h-10 text-xl">Set as Planned</button>
-                <button className="hover:bg-zinc-500 cursor-pointer h-10 text-xl">Set as Ignored</button>
+                <button onClick={() => setStatus("bookmarked")} className="hover:bg-zinc-500 cursor-pointer h-10 text-xl">Set as Planned</button>
+                <button onClick={() => setStatus("ignored")} className="hover:bg-zinc-500 cursor-pointer h-10 text-xl">Set as Ignored</button>
               </div>
             )}
           </div>
@@ -119,7 +151,7 @@ export default function TowerPage({
               <div className="w-80 h-80 md:w-100 bg-zinc-900 border-white border-2 rounded-md">
                 <div className="w-full h-10 flex justify-between items-center px-4 border-b border-white">
                   <span className="text-xl text-outline">Reviews</span>
-                  {isAuthenticated && isCompleted && <button className="bg-zinc-700 px-2 py-1 rounded-md hover:bg-zinc-500" onClick={() => setReviewWindow(true)}>Write a Review</button>}
+                  {isAuthenticated && towerStatus=="completed" && <button className="bg-zinc-700 px-2 py-1 rounded-md hover:bg-zinc-500" onClick={() => setReviewWindow(true)}>Write a Review</button>}
                 </div>
               </div>
               <div className="h-80 w-80 bg-zinc-900 md:ml-10 border-white border-2 rounded-md mt-8 md:mt-0 ">
