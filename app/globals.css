@@ -98,3 +98,27 @@ body {
   }
 }
 
+::-webkit-scrollbar {
+  width: 12px;
+  height: 12px;
+}
+
+::-webkit-scrollbar-track {
+  background: #27272a; 
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #52525b; 
+  border-radius: 4px;
+  border: 2px solid #27272a; 
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #71717a; 
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #52525b #27272a;
+}

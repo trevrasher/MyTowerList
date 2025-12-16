@@ -38,6 +38,7 @@ export default function TowerPage({
   const [selectedReview, setSelectedReview] = useState<Review | null>(null);
   const [reviewsNextUrl, setReviewsNextUrl] = useState<string | null>(null);
   const [hasMoreReviews, setHasMoreReviews] = useState(true);
+  const [userReview, setUserReview] = useState<Review | null>(null);
 
 
   async function setStatus(status: string) {
@@ -63,6 +64,26 @@ export default function TowerPage({
       setError(`Failed to update tower status: ${error}`);
     }
   }
+
+  useEffect(() => {
+    async function fetchUserReview() {
+      if (!tower || !isAuthenticated) return;
+
+      try {
+        const url = `${API_BASE_URL}/api/towers/${tower.id}/reviews/?my_review=true`;
+        const data = await fetchWithAuth(url);
+
+        if (data.results && data.results.length > 0) {
+          setUserReview(data.results[0]);
+        } else {
+          setUserReview(null);
+        }
+      } catch (error) {
+        console.error('Failed to fetch user review:', error);
+      }
+    }
+    fetchUserReview();
+  }, [tower, isAuthenticated]);
 
   useEffect(() => {
     async function fetchTower() {
@@ -207,7 +228,8 @@ export default function TowerPage({
               <div className="w-80 h-80 md:w-100 bg-zinc-900 border-white border-2 rounded-md">
                 <div className="w-full h-10 flex justify-between items-center px-4 border-b border-white">
                   <span className="text-xl text-outline">Reviews</span>
-                  {isAuthenticated && towerStatus == "completed" && <button className="bg-zinc-700 px-2 py-1 rounded-md hover:bg-zinc-500" onClick={() => setReviewWindow(true)}>Write a Review</button>}
+                  {isAuthenticated && towerStatus == "completed" && !userReview && <button className="bg-zinc-700 px-2 py-1 rounded-md hover:bg-zinc-500" onClick={() => setReviewWindow(true)}>Write a Review</button>}
+                  {isAuthenticated && towerStatus == "completed" && userReview && <button className="bg-blue-600 px-2 py-1 rounded-md hover:bg-blue-500" onClick={() => setSelectedReview(userReview)}>View My Review</button>}
                 </div>
 
                 <div id="reviews-scrollable" className="h-65 overflow-y-auto">
@@ -284,9 +306,11 @@ export default function TowerPage({
           towerId={tower.id}
         />
       )}
-            {selectedReview && (
+      {selectedReview && (
         <ViewReviewModal
           review={selectedReview}
+          towerId={tower.id}
+          isOwnReview={userReview?.id === selectedReview.id}
           onClose={() => setSelectedReview(null)}
         />
       )}
