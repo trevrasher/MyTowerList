@@ -1,4 +1,5 @@
 import AutoAreaFilterButton from "./autoAreaFilterButton";
+import { areas } from "../utils/towers";
 
 interface AreaFilterProps {
     areas: string[]
@@ -9,7 +10,7 @@ interface AreaFilterProps {
 
 
 
-export default function AreaFilter({areas, setSelectedAreas, selectedAreas, isAuthenticated}: AreaFilterProps) {
+export default function AreaFilter({ areas, setSelectedAreas, selectedAreas, isAuthenticated }: AreaFilterProps) {
 
     const groupedAreas = areas.reduce<{ [key: string]: string[] }>((acc, area) => {
         const group = area.startsWith("Ring") ? "Rings" : area.startsWith("Zone") ? "Zones" : "Subareas";
@@ -36,28 +37,34 @@ export default function AreaFilter({areas, setSelectedAreas, selectedAreas, isAu
             setSelectedAreas([...selectedAreas, ...groupAreas]);
         }
     };
-    
+
     return (
-    <div>
-        {isAuthenticated && <AutoAreaFilterButton setSelectedAreas={setSelectedAreas} />}
-    {Object.entries(groupedAreas).map(([group, groupAreas]) => (
-        <div key={group} className="mb-4 text-xl">
-        <label className="font-bold mb-2 cursor-pointer" onClick={() => worldToggle(group)}>{group}</label>
-        <div className="columns-2 gap-2">
-        {groupAreas.map((area) => (
-            <label key={area} className="flex items-center space-x-2 cursor-pointer break-inside-avoid pb-1">
-            <input
-                type="checkbox"
-                checked={selectedAreas.includes(area)}
-                onChange={() => handleToggle(area)}
-                className="daily-checkbox"
-            />
-            <span className="text-sm text-zinc-300">{area === "The Starlit Archives" ? "Starlit Archives" : area}</span>
-            </label>
-        ))}
+        <div>
+            <div className="flex flex-col">
+                {isAuthenticated && <AutoAreaFilterButton setSelectedAreas={setSelectedAreas} />}
+                <div className="flex justify-between mt-2 mb-2">
+                    <button onClick={() => setSelectedAreas(areas)} className="bg-zinc-600 text-white px-4 py-2 rounded hover:bg-zinc-400 mr-1 w-1/2">Show All</button>
+                    <button onClick={() => setSelectedAreas([""])} className="bg-zinc-600 text-white px-4 py-2 rounded hover:bg-zinc-400 ml-1 w-1/2">Hide All</button>
+                </div>
+            </div>
+            {Object.entries(groupedAreas).map(([group, groupAreas]) => (
+                <div key={group} className="mb-4 text-xl">
+                    <label className="font-bold mb-2 cursor-pointer" onClick={() => worldToggle(group)}>{group}</label>
+                    <div className="columns-2 gap-2">
+                        {groupAreas.map((area) => (
+                            <label key={area} className="flex items-center space-x-2 cursor-pointer break-inside-avoid pb-1">
+                                <input
+                                    type="checkbox"
+                                    checked={selectedAreas.includes(area)}
+                                    onChange={() => handleToggle(area)}
+                                    className="daily-checkbox"
+                                />
+                                <span className="text-sm text-zinc-300">{area === "The Starlit Archives" ? "Starlit Archives" : area}</span>
+                            </label>
+                        ))}
+                    </div>
+                </div>
+            ))}
         </div>
-        </div>
-    ))}
-    </div>
     );
 }
