@@ -85,6 +85,7 @@ class Badge(models.Model):
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile', null=True)
     roblox_user_id = models.BigIntegerField(unique=True, null=True, blank=True)
+    avatar_url = models.URLField(null=True, blank=True)
 
     def __str__(self):
         return f"{self.user.username}'s Profile"
@@ -126,6 +127,24 @@ class Profile(models.Model):
             'total_checked': uncompleted_towers.count(),
             'newly_completed_count': newly_completed.count()
         }
+    
+    def update_avatar_url(self):
+        if not self.roblox_user_id:
+            return None
+        
+        try:
+            resp = requests.get(
+                f"https://thumbnails.roblox.com/v1/users/avatar-headshot?userIds={self.roblox_user_id}&size=150x150&format=Png&isCircular=false"
+            )
+            data = resp.json()
+            if data.get("data") and data["data"][0].get("imageUrl"):
+                self.avatar_url = data["data"][0]["imageUrl"]
+                self.save()
+                return self.avatar_url
+        except requests.RequestException:
+            return None
+        
+        return None
         
 class TowerReview(models.Model):
     profile = models.ForeignKey('Profile', on_delete=models.CASCADE)

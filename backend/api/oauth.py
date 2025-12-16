@@ -101,6 +101,8 @@ def roblox_callback(request):
             profile.roblox_user_id = roblox_id
             profile.save()
         
+        profile.update_avatar_url()
+    
         tokens = get_tokens_for_user(user)
         
         frontend_url = settings.FRONTEND_URL

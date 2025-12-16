@@ -6,8 +6,20 @@ import { useEffect, useState, useRef } from "react";
 import { getTowerImageUrl, getTowerAreaImage, diffColors, getTowerDifficultyWord, Tower, getTowerAreaBanner } from "@/app/utils/towers";
 import { fetchWithAuth } from "@/app/utils/auth";
 import ReviewModal from "@/app/components/reviewModal";
+import InfiniteScroll from "react-infinite-scroll-component";
 
 
+
+interface Review {
+  id: number;
+  profile: {
+    username: string;
+    roblox_user_id: number;
+  };
+  score: number;
+  review_text: string;
+  summary: string;
+}
 
 export default function TowerPage({
   params
@@ -20,7 +32,9 @@ export default function TowerPage({
   const isAuthenticated = useAuth();
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [reviewWindow, setReviewWindow] = useState(false);
-  const dropdownRef = useRef<HTMLDivElement>(null);
+  const [reviews, setReviews] = useState<Review[]>([]);
+  const [reviewsNextUrl, setReviewsNextUrl] = useState<string | null>(null);
+  const [hasMoreReviews, setHasMoreReviews] = useState(true);
 
 
   async function setStatus(status: string) {
@@ -82,6 +96,39 @@ export default function TowerPage({
     fetchTowerCompletion()
   }, [tower, isAuthenticated]);
 
+  useEffect(() => {
+    async function fetchReviews() {
+      if (!tower) return;
+      
+      try {
+        const url = `${API_BASE_URL}/api/towers/${tower.id}/reviews/?limit=10`;
+        const res = await fetch(url);
+        const data = await res.json();
+        
+        setReviews(data.results || []);
+        setReviewsNextUrl(data.next);
+        setHasMoreReviews(Boolean(data.next));
+      } catch (error) {
+        console.error('Failed to fetch reviews:', error);
+      }
+    }
+    fetchReviews();
+  }, [tower]);
+
+  const fetchMoreReviews = async () => {
+    if (!reviewsNextUrl) return;
+    
+    try {
+      const res = await fetch(reviewsNextUrl);
+      const data = await res.json();
+      
+      setReviews(prev => [...prev, ...(data.results || [])]);
+      setReviewsNextUrl(data.next);
+      setHasMoreReviews(Boolean(data.next));
+    } catch (error) {
+      console.error('Failed to fetch more reviews:', error);
+    }
+  };
 
   if (error) return <div>{error}</div>;
   if (!tower) return <div>Loading...</div>;
@@ -158,6 +205,31 @@ export default function TowerPage({
                 <div className="w-full h-10 flex justify-between items-center px-4 border-b border-white">
                   <span className="text-xl text-outline">Reviews</span>
                   {isAuthenticated && towerStatus == "completed" && <button className="bg-zinc-700 px-2 py-1 rounded-md hover:bg-zinc-500" onClick={() => setReviewWindow(true)}>Write a Review</button>}
+                </div>
+                
+                <div id="reviews-scrollable" className="h-65 overflow-y-auto">
+                  <InfiniteScroll
+                    dataLength={reviews.length}
+                    next={fetchMoreReviews}
+                    hasMore={hasMoreReviews}
+                    loader={<div className="text-center py-2">Loading...</div>}
+                    scrollableTarget="reviews-scrollable"
+                  >
+                    {reviews.map((review) => (
+                      <div key={review.id} className="p-4 border-b border-zinc-700">
+                        <div className="flex items-center justify-between mb-2">
+                          <span className="font-bold text-outline">{review.profile.username}</span>
+                          <span className="text-yellow-500">{review.score}/100</span>
+                        </div>
+                        {review.summary && (
+                          <p className="text-sm font-semibold mb-1 text-outline">{review.summary}</p>
+                        )}
+                        {review.review_text && (
+                          <p className="text-sm text-gray-300">{review.review_text}</p>
+                        )}
+                      </div>
+                    ))}
+                  </InfiniteScroll>
                 </div>
               </div>
               <div className="h-80 w-80 bg-zinc-900 md:ml-10 border-white border-2 rounded-md mt-8 md:mt-0 ">

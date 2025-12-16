@@ -1,7 +1,7 @@
 from rest_framework.response import Response
 from rest_framework import generics
-from .models import Tower, Area
-from .serializer import TowerSerializer
+from .models import Tower, Area, TowerReview
+from .serializer import TowerSerializer, TowerReviewSerializer
 import requests
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
@@ -262,3 +262,12 @@ class SetTowerReview(APIView):
         return Response({
             'message': f'Tower review created for {tower}',
         })
+
+
+class GetTowerReviews(generics.ListAPIView):
+    serializer_class = TowerReviewSerializer
+    pagination_class = LimitOffsetPagination
+    
+    def get_queryset(self):
+        tower_id = self.kwargs['tower_id']
+        return TowerReview.objects.filter(tower_id=tower_id).select_related('profile__user').order_by('-id')

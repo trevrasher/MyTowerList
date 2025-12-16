@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Tower, Creator
+from .models import Tower, Creator, Profile, TowerReview
 
 
 
@@ -16,4 +16,17 @@ class TowerSerializer(serializers.ModelSerializer):
         model = Tower
         fields = '__all__'
     
+class ProfileSerializer(serializers.ModelSerializer):
+    username = serializers.CharField(source='user.username', read_only=True)
+    
+    class Meta:
+        model = Profile
+        fields = ['username', 'roblox_user_id', '']
+
+class TowerReviewSerializer(serializers.ModelSerializer):
+    profile = ProfileSerializer(read_only=True)
+    
+    class Meta:
+        model = TowerReview
+        fields = ['profile', 'score', 'review_text', 'summary']
 
