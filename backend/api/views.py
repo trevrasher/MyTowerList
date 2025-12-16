@@ -267,6 +267,7 @@ class SetTowerReview(APIView):
 class GetTowerReviews(generics.ListAPIView):
     serializer_class = TowerReviewSerializer
     pagination_class = LimitOffsetPagination
+    permission_classes = []
     
     def get_queryset(self):
         tower_id = self.kwargs['tower_id']
