@@ -1,6 +1,7 @@
 import { useState } from "react"
 import { API_BASE_URL } from "@/next.config";
 import { fetchWithAuth } from "@/app/utils/auth";
+import ErrorPopup from "./errorPopup";
 
 interface ReviewModalProps {
     onClose: () => void;
@@ -24,12 +25,12 @@ export default function ReviewModal({ onClose, towerId }: ReviewModalProps) {
 
     const handleScore = (e: React.ChangeEvent<HTMLInputElement>) => {
         const inputValue = e.target.value;
-        
+
         if (inputValue === "") {
             setScore("");
             return;
         }
-        
+
         const value = Math.max(0, Math.min(100, Number(inputValue)));
         setScore(value);
     };
@@ -54,7 +55,7 @@ export default function ReviewModal({ onClose, towerId }: ReviewModalProps) {
 
             onClose();
         } catch (err) {
-            setError('Failed to submit review. Please try again.');
+            setError('Failed to submit review.');
             console.error('Review submission error:', err);
         } finally {
             setIsSubmitting(false);
@@ -105,11 +106,13 @@ export default function ReviewModal({ onClose, towerId }: ReviewModalProps) {
                         </button>
                     </div>
 
-                    {error && (
-                        <div className="text-red-500 mb-4">{error}</div>
-                    )}
+
                 </div>
             </div>
+            {error && (
+                <ErrorPopup errorText={error} onClear={() => setError(null)} />
+            )}
         </div>
+
     );
 }

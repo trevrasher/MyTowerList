@@ -61,3 +61,38 @@ body {
     -2px  2px 0 #000,
      2px  2px 0 #000;
 }
+
+
+.error {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #dc3545;
+  border-radius: 8px;
+  padding: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-width: 300px;
+  z-index: 1000;
+  animation: slideUp 0.3s ease-out;
+  opacity: 1;
+  transition: opacity 0.5s ease-out;
+}
+
+.error.fade-out {
+  opacity: 0;
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateX(-50%) translateY(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(-50%) translateY(0);
+    opacity: 1;
+  }
+}
+
