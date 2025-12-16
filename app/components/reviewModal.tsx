@@ -41,7 +41,7 @@ export default function ReviewModal({ onClose, towerId }: ReviewModalProps) {
         setError(null);
 
         try {
-            await fetchWithAuth(`${API_BASE_URL}/api/towers/${towerId}/reviews/`, {
+            await fetchWithAuth(`${API_BASE_URL}/api/towers/${towerId}/reviews/post/`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
