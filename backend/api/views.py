@@ -42,7 +42,7 @@ class TowerListView(generics.ListAPIView):
                 return ''.join([w[0] for w in name.split()]).lower()
             queryset = [tower for tower in queryset if
                         search in tower.name.lower() or
-                        search in get_acronym(tower.name)]
+                        search == get_acronym(tower.name)]
             
         return queryset
 
