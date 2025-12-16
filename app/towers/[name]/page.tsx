@@ -2,18 +2,22 @@
 import { API_BASE_URL } from "@/next.config";
 import MainHeader from "@/app/components/mainHeader";
 import { useAuth } from "@/app/hooks/useAuth";
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
 import { getTowerImageUrl, getTowerAreaImage, diffColors, getTowerDifficultyWord, Tower, getTowerAreaBanner } from "@/app/utils/towers";
 import { fetchWithAuth } from "@/app/utils/auth";
 import ReviewModal from "@/app/components/reviewModal";
+import ViewReviewModal from "@/app/components/viewReviewModal";
 import InfiniteScroll from "react-infinite-scroll-component";
 
 
 
 interface Review {
   id: number;
-  username: string;
-  roblox_user_id: number;
+  profile: {
+    username: string;
+    roblox_user_id: number;
+    avatar_url: string;
+  };
   score: number;
   review_text: string;
   summary: string;
@@ -31,6 +35,7 @@ export default function TowerPage({
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [reviewWindow, setReviewWindow] = useState(false);
   const [reviews, setReviews] = useState<Review[]>([]);
+  const [selectedReview, setSelectedReview] = useState<Review | null>(null);
   const [reviewsNextUrl, setReviewsNextUrl] = useState<string | null>(null);
   const [hasMoreReviews, setHasMoreReviews] = useState(true);
 
@@ -214,13 +219,28 @@ export default function TowerPage({
                     scrollableTarget="reviews-scrollable"
                   >
                     {reviews.map((review) => (
-                      <div key={review.id} className="p-4 border-b border-zinc-700">
+                      <div
+                        key={review.id}
+                        className="pt-4 pl-4 pr-4 border-b border-zinc-700 cursor-pointer hover:bg-zinc-800 transition"
+                        onClick={() => setSelectedReview(review)}
+                      >
                         <div className="flex items-center justify-between mb-2">
-                          <span className="font-bold text-outline">{review.username}</span>
+                          <div className="flex items-center gap-2">
+                            {review.profile.avatar_url && (
+                              <img
+                                src={review.profile.avatar_url}
+                                alt={`${review.profile.username}'s avatar`}
+                                className="h-12 w-12 border-2 border-white rounded-md"
+                              />
+                            )}
+                            <span className="text-xl font-bold text-outline">{review.profile.username}</span>
+                          </div>
                           <span className="text-yellow-500">{review.score}/100</span>
                         </div>
                         {review.summary && (
-                          <p className="text-sm font-semibold mb-1 text-outline">{review.summary}</p>
+                          <div className="overflow-x-auto pb-3">
+                            <p className="text-sm font-semibold text-outline whitespace-nowrap">{review.summary}</p>
+                          </div>
                         )}
                       </div>
                     ))}
@@ -262,6 +282,12 @@ export default function TowerPage({
         <ReviewModal
           onClose={() => setReviewWindow(false)}
           towerId={tower.id}
+        />
+      )}
+            {selectedReview && (
+        <ViewReviewModal
+          review={selectedReview}
+          onClose={() => setSelectedReview(null)}
         />
       )}
     </>

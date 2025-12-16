@@ -53,7 +53,7 @@ export default function ReviewModal({ onClose, towerId }: ReviewModalProps) {
                 })
             });
 
-            onClose();
+            window.location.reload();
         } catch (err) {
             setError('Failed to submit review.');
             console.error('Review submission error:', err);
