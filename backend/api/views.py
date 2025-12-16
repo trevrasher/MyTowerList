@@ -252,16 +252,22 @@ class SetTowerReview(APIView):
             )
         
         TowerReview.objects.update_or_create(
-            profile = profile,
-            tower =tower,
-            score = score,
-            review_text=review,
-            summary = summary,
+            profile=profile,
+            tower=tower,
+            defaults={
+                'score': score,
+                'review_text': review,
+                'summary': summary,
+            }
         )
+
 
         return Response({
             'message': f'Tower review created for {tower}',
         })
+    
+
+
 
 
 class GetTowerReviews(generics.ListAPIView):
@@ -271,4 +277,42 @@ class GetTowerReviews(generics.ListAPIView):
     
     def get_queryset(self):
         tower_id = self.kwargs['tower_id']
-        return TowerReview.objects.filter(tower_id=tower_id).select_related('profile__user').order_by('-id')
+        queryset = TowerReview.objects.filter(tower_id=tower_id).select_related('profile__user')
+        
+        if self.request.query_params.get('my_review') == 'true':
+            if self.request.user.is_authenticated:
+                queryset = queryset.filter(profile=self.request.user.profile)
+            else:
+                return TowerReview.objects.none()
+        
+        return queryset.order_by('-id')
+    
+
+
+class DeleteTowerReview(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def delete(self, request, tower_id):
+        from .models import TowerReview
+
+        profile = request.user.profile
+
+        try:
+            tower = Tower.objects.get(id=tower_id)
+        except Tower.DoesNotExist:
+            return Response(
+                {'error': 'Tower not found'}, 
+                status=status.HTTP_404_NOT_FOUND
+            )
+        
+        try:
+            review = TowerReview.objects.get(profile=profile, tower=tower)
+            review.delete()
+            return Response({
+                'message': 'Review deleted successfully',
+            })
+        except TowerReview.DoesNotExist:
+            return Response(
+                {'error': 'Review not found'}, 
+                status=status.HTTP_404_NOT_FOUND
+            )
