@@ -195,7 +195,8 @@ class GetTowerCompletion(APIView):
         if tower_status:
             return Response({"status": tower_status.status})
         else:
-            return Response({"status": None})
+            return Response({"status": "incomplete"})
+
     
 class SetTowerStatus(APIView):
     permission_classes = [IsAuthenticated]

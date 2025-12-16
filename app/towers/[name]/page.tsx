@@ -100,7 +100,7 @@ export default function TowerPage({
             {towerStatus == "completed" && <div className="bg-green-600 h-15 w-80 mt-4 rounded-lg border-1 flex items-center justify-center">
               <span className="mx-auto my-auto text-2xl text-outline">Complete</span>
             </div>}
-            {(towerStatus == null || towerStatus == "incomplete") && <button
+            {(towerStatus == "incomplete") && <button
               className="bg-zinc-600 h-15 w-80 mt-4 rounded-lg border-1 flex items-center justify-center hover:bg-zinc-500 cursor-pointer"
               onClick={() => setDropdownOpen((open) => !open)}
             >
