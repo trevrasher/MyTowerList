@@ -131,7 +131,8 @@ class TowerReview(models.Model):
     profile = models.ForeignKey('Profile', on_delete=models.CASCADE)
     tower = models.ForeignKey('Tower', on_delete=models.CASCADE)
     score = models.PositiveSmallIntegerField(validators=[MinValueValidator(0), MaxValueValidator(100)])
-    review_text = models.TextField(blank=True, null=True)  
+    review_text = models.TextField(max_length=1500, blank=True, null=True)  
+    summary = models.TextField(max_length=80, blank=True, null=True)
 
     class Meta:
         unique_together = ('profile', 'tower')

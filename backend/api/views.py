@@ -230,3 +230,34 @@ class SetTowerStatus(APIView):
         return Response({
             'message': f'Tower status set to {status_value}',
         })
+
+class SetTowerReview(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, tower_id):
+        from .models import TowerReview
+
+        profile = request.user.profile
+        review = request.data.get('review')
+        summary = request.data.get('summary')
+        score = request.data.get('score')
+
+        try:
+            tower = Tower.objects.get(id=tower_id)
+        except Tower.DoesNotExist:
+            return Response(
+                {'error': 'Tower not found'}, 
+                status=status.HTTP_404_NOT_FOUND
+            )
+        
+        TowerReview.objects.update_or_create(
+            profile = profile,
+            tower =tower,
+            score = score,
+            review_text=review,
+            summary = summary,
+        )
+
+        return Response({
+            'message': f'Tower review created for {tower}',
+        })
