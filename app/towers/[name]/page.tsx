@@ -101,7 +101,7 @@ export default function TowerPage({
       if (!tower) return;
       
       try {
-        const url = `${API_BASE_URL}/api/towers/${tower.id}/reviews/?limit=10`;
+        const url = `${API_BASE_URL}/api/towers/${tower.id}/reviews/?limit=5`;
         const res = await fetch(url);
         const data = await res.json();
         
