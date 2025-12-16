@@ -24,9 +24,13 @@ class ProfileSerializer(serializers.ModelSerializer):
         fields = ['username', 'roblox_user_id', '']
 
 class TowerReviewSerializer(serializers.ModelSerializer):
-    profile = ProfileSerializer(read_only=True)
+    username = serializers.SerializerMethodField()
     
     class Meta:
         model = TowerReview
-        fields = ['profile', 'score', 'review_text', 'summary']
-
+        fields = '__all__'
+    
+    def get_username(self, obj):
+        if obj.profile and obj.profile.user:
+            return obj.profile.user.username
+        return "Unknown User"
