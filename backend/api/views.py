@@ -274,10 +274,13 @@ class GetTowerReviews(generics.ListAPIView):
     serializer_class = TowerReviewSerializer
     pagination_class = LimitOffsetPagination
     permission_classes = []
-    
+
     def get_queryset(self):
         tower_id = self.kwargs['tower_id']
-        queryset = TowerReview.objects.filter(tower_id=tower_id).select_related('profile__user')
+        queryset = TowerReview.objects.filter(
+            tower_id=tower_id,
+            review_text__isnull=False  # Only reviews with text
+        ).exclude(review_text='').select_related('profile__user')
         
         if self.request.query_params.get('my_review') == 'true':
             if self.request.user.is_authenticated:
@@ -286,7 +289,6 @@ class GetTowerReviews(generics.ListAPIView):
                 return TowerReview.objects.none()
         
         return queryset.order_by('-id')
-    
 
 
 class DeleteTowerReview(APIView):
