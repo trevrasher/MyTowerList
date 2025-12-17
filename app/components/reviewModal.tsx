@@ -63,7 +63,7 @@ export default function ReviewModal({ onClose, towerId }: ReviewModalProps) {
     };
 
     return (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50" onClick={onClose}>
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
             <div className="w-[50vw] h-150 bg-zinc-800 flex flex-col items-start rounded-md border-2 p-6" onClick={(e) => e.stopPropagation()}>
 
                 <div className="w-full">
@@ -93,6 +93,9 @@ export default function ReviewModal({ onClose, towerId }: ReviewModalProps) {
                     <span className="text-stroke text-xl">Score</span>
                     <div className="flex justify-between items-center mt-2">
                         <input type="number" value={score} onChange={(e) => handleScore(e)}
+                            onInput={(e) => {
+                                e.currentTarget.value = e.currentTarget.value.replace(/[^0-9]/g, '');
+                            }}
                             min="0"
                             max="100"
                             className="w-16 h-10 px-2 rounded border border-zinc-400 text-center text-lg [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"

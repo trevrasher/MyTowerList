@@ -33,12 +33,57 @@ export default function TowerPage({
   const [towerStatus, setTowerStatus] = useState<string | null>(null);
   const isAuthenticated = useAuth();
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [completeDropdown, setCompleteDropdown] = useState(false);
   const [reviewWindow, setReviewWindow] = useState(false);
   const [reviews, setReviews] = useState<Review[]>([]);
   const [selectedReview, setSelectedReview] = useState<Review | null>(null);
   const [reviewsNextUrl, setReviewsNextUrl] = useState<string | null>(null);
   const [hasMoreReviews, setHasMoreReviews] = useState(true);
   const [userReview, setUserReview] = useState<Review | null>(null);
+  const [score, setScore] = useState<number | "">(50);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleScore = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const inputValue = e.target.value;
+
+    if (inputValue === "") {
+      setScore("");
+      return;
+    }
+
+    const value = Math.max(0, Math.min(100, Number(inputValue)));
+    setScore(value);
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    setError(null);
+
+    if (tower) {
+      try {
+        await fetchWithAuth(`${API_BASE_URL}/api/towers/${tower.id}/reviews/post/`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            score: score === "" ? 0 : score,
+            review: "",
+            summary: "",
+          })
+        });
+
+        window.location.reload();
+      } catch (err) {
+        setError('Failed to submit review.');
+        console.error('Review submission error:', err);
+      } finally {
+        setIsSubmitting(false);
+      }
+    };
+
+  }
 
 
   async function setStatus(status: string) {
@@ -168,9 +213,13 @@ export default function TowerPage({
         <div className="flex-col  md:absolute inset-0 md:mx-auto md:w-[60vw] z-10  md:mt-20 flex md:flex-row items-start justify-center">
           <div className="flex flex-col items-center">
             <img src={getTowerImageUrl(tower.name)} className="h-60 w-60 md:h-120 md:w-80 object-cover rounded-lg shadow-lg border-3" />
-            {towerStatus == "completed" && <div className="bg-green-600 h-15 w-80 mt-4 rounded-lg border-1 flex items-center justify-center">
+            {(towerStatus == "completed") && <button
+              className="bg-green-600 h-15 w-80 mt-4 rounded-lg border-1 flex items-center justify-center hover:bg-green-500 cursor-pointer"
+              onClick={() => setCompleteDropdown((open) => !open)}
+            >
+
               <span className="mx-auto my-auto text-2xl text-outline">Complete</span>
-            </div>}
+            </button>}
             {(towerStatus == "incomplete") && <button
               className="bg-zinc-600 h-15 w-80 mt-4 rounded-lg border-1 flex items-center justify-center hover:bg-zinc-500 cursor-pointer"
               onClick={() => setDropdownOpen((open) => !open)}
@@ -194,10 +243,32 @@ export default function TowerPage({
             </button>}
 
             {dropdownOpen && (
-              <div className="flex flex-col bg-zinc-600 border rounded-lg shadow-lg mt-1 w-50 py-4">
+              <div className="flex flex-col bg-zinc-800 border rounded-lg shadow-lg mt-1 w-50 py-4">
                 {(towerStatus !== "bookmarked") && <button onClick={() => setStatus("bookmarked")} className="hover:bg-zinc-500 cursor-pointer h-10 text-xl">Set as Planned</button>}
                 {(towerStatus !== "ignored") && <button onClick={() => setStatus("ignored")} className="hover:bg-zinc-500 cursor-pointer h-10 text-xl">Set as Ignored</button>}
                 {(towerStatus !== "incomplete") && <button onClick={() => setStatus("incomplete")} className="hover:bg-zinc-500 cursor-pointer h-10 text-xl">Remove from List</button>}
+              </div>
+
+            )}
+            {completeDropdown && (
+              <div className="flex flex-col bg-zinc-800 border-2 rounded-lg shadow-lg mt-1 w-50 py-4">
+                <span className="text-xl mx-auto pb-2 text-outline">Score </span>
+                <div className="flex px-2 justify-between">
+                  <input type="number" value={score} onChange={(e) => handleScore(e)}
+                    onInput={(e) => {
+                      e.currentTarget.value = e.currentTarget.value.replace(/[^0-9]/g, '');
+                    }}
+                    min="0"
+                    max="100"
+                    className="w-16 h-10 px-2 rounded border border-zinc-400 text-center text-lg [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                  />
+                  <button
+                    onClick={handleSubmit}
+                    disabled={isSubmitting || score === ""} className="bg-blue-600 px-6 py-2 rounded hover:bg-blue-500 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                  >Submit</button>
+                </div>
+
+
               </div>
             )}
           </div>
