@@ -10,12 +10,17 @@ import { useAuth } from "./hooks/useAuth";
 import { fetchWithAuth } from "./utils/auth";
 import { Tower, areas, diffColors, getTowerDifficultyWord, getTowerImageUrl } from "./utils/towers";
 
+interface TowerStatus {
+  tower_id: number;
+  status: string;
+}
+
 
 function buildQueryParams(
   selectedAreas: string[],
   difficultyRange: number[],
   completedToggle: boolean,
-  completedTowers: number[]
+  towerStatuses: Map<number, string>
 ) {
   const params = new URLSearchParams();
   if (selectedAreas.length && selectedAreas.length !== areas.length) {
@@ -23,9 +28,13 @@ function buildQueryParams(
   }
   params.append("difficulty_min", difficultyRange[0].toString());
   params.append("difficulty_max", difficultyRange[1].toString());
-  if (completedToggle && completedTowers.length) {
+  if (completedToggle && towerStatuses.size) {
     params.append("exclude_completed", "true");
-    completedTowers.forEach(id => params.append("completed_ids", id.toString()));
+    towerStatuses.forEach((status, id) => {
+      if (status === 'completed') {
+        params.append("completed_ids", id.toString());
+      }
+    });
   }
   return `${API_BASE_URL}/api/towers/?${params.toString()}`;
 }
@@ -34,7 +43,7 @@ export default function Home() {
   const [towers, setTowers] = useState<Tower[]>([]);
   const [nextUrl, setNextUrl] = useState<string | null>(null);
   const [hasMore, setHasMore] = useState(true);
-  const [completedTowers, setCompletedTowers] = useState<number[]>([]);
+  const [towerStatuses, setTowerStatuses] = useState<Map<number, string>>(new Map());
   const isAuthenticated = useAuth();
   const [selectedAreas, setSelectedAreas] = useState<string[]>(areas);
   const [completedToggle, setCompletedToggle] = useState<boolean>(false);
@@ -43,7 +52,7 @@ export default function Home() {
   const [completedTowersLoaded, setCompletedTowersLoaded] = useState<boolean>(false);
 
   const handleSearch = (query: string) => {
-    const baseQuery = buildQueryParams(selectedAreas, difficultyRange, completedToggle, completedTowers);
+    const baseQuery = buildQueryParams(selectedAreas, difficultyRange, completedToggle, towerStatuses);
     const url = `${API_BASE_URL}/api/towers/?${baseQuery}&search=${encodeURIComponent(query)}`
     setTowers([]);
     setNextUrl(url);
@@ -59,12 +68,15 @@ export default function Home() {
     }
     fetchWithAuth(`${API_BASE_URL}/api/profile/completed-towers/`)
       .then((data) => {
-        const ids = data.map((item: any) => item.id);
-        setCompletedTowers(ids);
+        const statusMap = new Map<number, string>();
+        data.forEach((item: TowerStatus) => {
+          statusMap.set(item.tower_id, item.status);
+        });
+        setTowerStatuses(statusMap);
         setCompletedTowersLoaded(true);
       })
       .catch((error) => {
-        console.error('Error fetching completed towers:', error);
+        console.error('Error fetching tower statuses:', error);
         setCompletedTowersLoaded(true);
       });
   }, [isAuthenticated]);
@@ -73,11 +85,11 @@ export default function Home() {
   useEffect(() => {
     if (!completedTowersLoaded) return;
     setTowers([]);
-    const url = buildQueryParams(selectedAreas, difficultyRange, completedToggle, completedTowers);
+    const url = buildQueryParams(selectedAreas, difficultyRange, completedToggle, towerStatuses);
     setNextUrl(url);
     setHasMore(true);
     fetchTowersPage(url, true);
-  }, [selectedAreas, difficultyRange, completedToggle, completedTowers, completedTowersLoaded]);
+  }, [selectedAreas, difficultyRange, completedToggle, towerStatuses, completedTowersLoaded]);
 
 
 
@@ -93,10 +105,6 @@ export default function Home() {
     setHasMore(Boolean(data.next));
     setLoading(false);
   };
-
-
-
-
 
   const fetchMoreTowers = () => {
     if (nextUrl && !loading) {
@@ -130,11 +138,20 @@ export default function Home() {
       >
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4 md:gap-6 lg:gap-8 w-[95vw] my-10 mx-auto">
           {towers.map((tower) => {
-            const isCompleted = completedTowers.includes(tower.id);
+            const isCompleted = towerStatuses.get(tower.id) === 'completed';
+            const isBookmarked = towerStatuses.get(tower.id) === 'bookmarked';
+
+
             return (
               <Link href={`/towers/${tower.name}`} key={tower.id}>
                 <div className="relative flex flex-col cursor-pointer hover:opacity-90 transition">
-                  <img src={getTowerImageUrl(tower.name)} alt={tower.name} className={`h-90 w-full object-cover block mx-auto rounded-lg shadow-lg mb-2` + (isCompleted ? " ring-4 ring-green-400" : "")} />
+                  <img
+                    src={getTowerImageUrl(tower.name)}
+                    alt={tower.name}
+                    className={`h-90 w-full object-cover block mx-auto rounded-lg shadow-lg mb-2 ${isCompleted ? "ring-4 ring-green-400" :
+                        isBookmarked ? "ring-4 ring-blue-400" : ""
+                      }`}
+                  />
                   <AreaIcon tower={tower} />
                   <div style={{ backgroundColor: diffColors[tower.diff_category] || "#fff" }} className="absolute bottom-14 right-0 w-14 h-14 rounded-md border-2 border-white shadow z-10 flex items-center justify-center" >
                     <span className="right-0.5 text-xl font-bold text-white text-outline">
