@@ -124,9 +124,8 @@ class GetCompletedTowers(APIView):
 
     def get(self, request):
         profile = request.user.profile
-        completed_tower_ids = profile.tower_statuses.filter(status='completed').values_list('tower_id', flat=True)
-        completed_towers = Tower.objects.filter(id__in=completed_tower_ids).select_related('area', 'badge').prefetch_related('creators_m2m').values('id')
-        return Response(list(completed_towers))
+        tower_statuses = profile.tower_statuses.values('tower_id', 'status')
+        return Response(list(tower_statuses))
     
 class GetEligibleAreas(APIView):
     permission_classes = [IsAuthenticated]
