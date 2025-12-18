@@ -35,7 +35,7 @@ class TowerListView(generics.ListAPIView):
         if exclude_completed == "true" and completed_ids:
             queryset = queryset.exclude(id__in=completed_ids)
         
-        ignored_ids = self.request.query.params.getlist('ignored_ids')
+        ignored_ids = self.request.query_params.getlist('ignored_ids')
         if ignored_ids:
             queryset = queryset.exclude(id__in=ignored_ids)
 

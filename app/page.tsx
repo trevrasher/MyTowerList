@@ -35,7 +35,12 @@ function buildQueryParams(
         params.append("completed_ids", id.toString());
       }
     });
-  }
+  } 
+  towerStatuses.forEach((status, id) => {
+    if (status === 'ignored') {
+      params.append("ignored_ids", id.toString());
+    }
+    });
   return `${API_BASE_URL}/api/towers/?${params.toString()}`;
 }
 
