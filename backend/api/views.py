@@ -321,3 +321,65 @@ class DeleteTowerReview(APIView):
                 {'error': 'Review not found'}, 
                 status=status.HTTP_404_NOT_FOUND
             )
+        
+class GetFullProfile(APIView):
+    permission_classes = []  
+    
+    def get(self, request, username):
+        from django.contrib.auth.models import User
+        
+        try:
+            user = User.objects.get(username=username)
+            profile = user.profile
+        except User.DoesNotExist:
+            return Response(
+                {'error': 'User not found'}, 
+                status=status.HTTP_404_NOT_FOUND
+            )
+        
+        roblox_user_id = profile.roblox_user_id
+        avatar_url = profile.avatar_url
+
+        all_statuses = profile.tower_statuses.select_related(
+            'tower__area', 
+            'tower__badge'
+        ).prefetch_related('tower__creators_m2m')
+
+        completed_list = []
+        bookmarked_list = []
+        ignored_list = []
+        
+        for ts in all_statuses:
+            if ts.status == 'completed':
+                completed_list.append(ts.tower)
+            elif ts.status == 'bookmarked':
+                bookmarked_list.append(ts.tower)
+            elif ts.status == 'ignored':
+                ignored_list.append(ts.tower)
+
+        completed_tower_ids = [t.id for t in completed_list]
+        review_scores = dict(
+            TowerReview.objects.filter(
+                profile=profile,
+                tower_id__in=completed_tower_ids
+            ).values_list('tower_id', 'score')
+        ) if completed_tower_ids else {}
+        
+        return Response({
+            "roblox_user_id": roblox_user_id,
+            "username": user.username,
+            "avatar_url": avatar_url,
+            "completed": {
+                "count": len(completed_list),
+                "towers": TowerSerializer(completed_list, many=True).data
+            },
+            "bookmarked": {
+                "count": len(bookmarked_list),
+                "towers": TowerSerializer(bookmarked_list, many=True).data
+            },
+            "ignored": {
+                "count": len(ignored_list),
+                "towers": TowerSerializer(ignored_list, many=True).data
+            },
+            "review_scores": review_scores
+        })

@@ -228,14 +228,14 @@ export default function TowerPage({
               <span className="mx-auto my-auto text-2xl text-outline">Incomplete</span>
             </button>}
             {towerStatus == "bookmarked" && <button
-              className="bg-sky-800 h-15 w-80 mt-4 rounded-lg border-1 flex items-center justify-center hover:bg-zinc-500 cursor-pointer"
+              className="bg-sky-800 h-15 w-80 mt-4 rounded-lg border-1 flex items-center justify-center hover:bg-sky-600 cursor-pointer"
               onClick={() => setDropdownOpen((open) => !open)}
             >
 
               <span className="mx-auto my-auto text-2xl text-outline">Planned</span>
             </button>}
             {towerStatus == "ignored" && <button
-              className="bg-red-800  h-15 w-80 mt-4 rounded-lg border-1 flex items-center justify-center hover:bg-zinc-500 cursor-pointer"
+              className="bg-red-800  h-15 w-80 mt-4 rounded-lg border-1 flex items-center justify-center hover:bg-red-600 cursor-pointer"
               onClick={() => setDropdownOpen((open) => !open)}
             >
 
