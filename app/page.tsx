@@ -55,14 +55,10 @@ export default function Home() {
   const [difficultyRange, setDifficultyRange] = useState<number[]>([1, 12]);
   const [loading, setLoading] = useState(false);
   const [completedTowersLoaded, setCompletedTowersLoaded] = useState<boolean>(false);
+  const [searchQuery, setSearchQuery] = useState<string>("");
 
   const handleSearch = (query: string) => {
-    const baseQuery = buildQueryParams(selectedAreas, difficultyRange, completedToggle, towerStatuses);
-    const url = `${API_BASE_URL}/api/towers/?${baseQuery}&search=${encodeURIComponent(query)}`
-    setTowers([]);
-    setNextUrl(url);
-    setHasMore(true);
-    fetchTowersPage(url, true);
+    setSearchQuery(query);
   };
 
   //completed towers check
@@ -90,11 +86,14 @@ export default function Home() {
   useEffect(() => {
     if (!completedTowersLoaded) return;
     setTowers([]);
-    const url = buildQueryParams(selectedAreas, difficultyRange, completedToggle, towerStatuses);
+    let url = buildQueryParams(selectedAreas, difficultyRange, completedToggle, towerStatuses);
+    if (searchQuery) {
+      url += `&search=${encodeURIComponent(searchQuery)}`;
+    }
     setNextUrl(url);
     setHasMore(true);
     fetchTowersPage(url, true);
-  }, [selectedAreas, difficultyRange, completedToggle, towerStatuses, completedTowersLoaded]);
+  }, [selectedAreas, difficultyRange, completedToggle, towerStatuses, completedTowersLoaded, searchQuery]);
 
 
 
@@ -130,6 +129,7 @@ export default function Home() {
         setCompletedToggle={setCompletedToggle}
         isAuthenticated={isAuthenticated}
         onSearch={handleSearch}
+        searchQuery={searchQuery}
       />
       <InfiniteScroll
         dataLength={towers.length}

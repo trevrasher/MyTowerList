@@ -1,5 +1,6 @@
 import { API_BASE_URL } from "@/next.config";
 
+
 export async function refreshAccessToken() {
   const refresh = localStorage.getItem('refresh_token');
   
@@ -50,7 +51,6 @@ export async function fetchWithAuth(url: string, options: RequestInit = {}) {
     try {
       const newToken = await refreshAccessToken();
       
-      // Update the authorization header with the new token
       options.headers = {
         ...options.headers,
         'Authorization': `Bearer ${newToken}`,

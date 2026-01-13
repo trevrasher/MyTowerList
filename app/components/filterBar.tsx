@@ -3,6 +3,7 @@ import DifficultyFilter from "./difficultyFilter";
 import AreaFilter from "./areaFilter";
 import CompletedFilter from "./completedFilter";
 import SearchBar from "./searchBar";
+import { areas } from "../utils/towers";
 
 
 
@@ -16,6 +17,7 @@ interface FilterBarProps {
   setCompletedToggle: (values: boolean) => void;
   isAuthenticated: boolean
   onSearch: (query: string) => void;
+  searchQuery: string;
 }
 
 
@@ -28,11 +30,11 @@ export default function FilterBar({
     completedToggle,
     setCompletedToggle,
     isAuthenticated,
-    onSearch
+    onSearch,
+    searchQuery
     }: FilterBarProps) {
 
     const [filterSelect, setFilterSelect] = useState<String>("");
-    const [searchBar, setSearchBar] = useState("");
     const filterRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -46,12 +48,20 @@ export default function FilterBar({
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [filterSelect]);
 
+  const handleReset = () => {
+    setSelectedAreas(areas);
+    setDifficultyRange([1,12]);
+    setCompletedToggle(false);
+    onSearch("");
+  }
+
     
     return (
     <div className="flex justify-center items-center relative w-full">
         <div className="flex flex-col sm:flex-row gap-4">
           <SearchBar 
             onSearch={onSearch}
+            value={searchQuery}
             />
           <div className="relative flex justify-center ">
             
@@ -100,6 +110,11 @@ export default function FilterBar({
             setCompletedToggle={setCompletedToggle}
             />
           }
+        </div>
+        <div>
+          <button className="w-30 h-15 bg-zinc-700 text-white rounded hover:bg-zinc-400 transition ml-4" onClick={handleReset}>
+            Reset Filters
+          </button>
         </div>
 
     </div>
