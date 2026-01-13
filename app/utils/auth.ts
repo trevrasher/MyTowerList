@@ -16,6 +16,7 @@ export async function refreshAccessToken() {
   if (!res.ok) {
     localStorage.removeItem('access_token');
     localStorage.removeItem('refresh_token');
+    localStorage.removeItem('avatar_url');
     throw new Error('Token refresh failed');
   }
   
