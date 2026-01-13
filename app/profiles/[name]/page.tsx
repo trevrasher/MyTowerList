@@ -100,7 +100,7 @@ export default function ProfilePage({ params }: { params: Promise<{ name: string
                                     <div key={tower.id} className="contents">
                                         <img src={getTowerImageUrl(tower.name)} className="h-15 w-11 rounded-md"></img>
                                         <span className="text-zinc-300 mt-4">{tower.name}</span>
-                                        <span className="text-zinc-300">{profileData?.review_scores[tower.id]}</span>
+                                        <span className="text-zinc-300 ml-4">{profileData?.review_scores[tower.id]}</span>
 
                                     </div>
                                 ))
