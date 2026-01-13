@@ -5,18 +5,23 @@ const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8
 
 export default function LoginButton() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  
 
-   useEffect(() => {
+  useEffect(() => {
     const checkToken = () => {
       const token = localStorage.getItem('access_token');
       setIsLoggedIn(!!token && token !== "undefined");
     };
 
-    checkToken(); 
+    checkToken();
+
+    const timeout = setTimeout(checkToken, 400);
 
     window.addEventListener('storage', checkToken);
-    return () => window.removeEventListener('storage', checkToken);
+
+    return () => {
+      clearTimeout(timeout);
+      window.removeEventListener('storage', checkToken);
+    };
   }, []);
 
   const handleLogin = () => {
@@ -32,7 +37,7 @@ export default function LoginButton() {
 
   if (isLoggedIn) {
     return (
-      <button 
+      <button
         onClick={handleLogout}
         className="bg-red-800 text-white px-4 py-2 rounded hover:bg-red-700 transition"
       >
@@ -42,7 +47,7 @@ export default function LoginButton() {
   }
 
   return (
-    <button 
+    <button
       onClick={handleLogin}
       className="bg-zinc-600 text-white px-4 py-2 rounded hover:bg-zinc-400 transition"
     >
