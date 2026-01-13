@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useRef} from "react";
 
 interface SearchBarProps {
   onSearch: (query: string) => void;
@@ -6,16 +6,37 @@ interface SearchBarProps {
 
 export default function SearchBar({ onSearch }: SearchBarProps) {
   const [query, setQuery] = useState("");
+  const timerRef = useRef<NodeJS.Timeout | null>(null);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setQuery(e.target.value);
+    const newQuery = e.target.value;
+    setQuery(newQuery);
+
+    if (timerRef.current) {
+      clearTimeout(timerRef.current);
+    }
+
+    timerRef.current = setTimeout(() => {
+      onSearch(newQuery);
+    }, 1000);
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter") {
+      if (timerRef.current) {
+        clearTimeout(timerRef.current);
+      }
       onSearch(query);
     }
   };
+
+  useEffect(() => {
+    return () => {
+      if (timerRef.current) {
+        clearTimeout(timerRef.current);
+      }
+    };
+  }, []);
 
   return (
     <div className="w-full flex justify-center ">
