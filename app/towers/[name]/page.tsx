@@ -7,7 +7,7 @@ import { getTowerImageUrl, getTowerAreaImage, diffColors, getTowerDifficultyWord
 import { fetchWithAuth } from "@/app/utils/auth";
 import ReviewModal from "@/app/components/reviewModal";
 import ViewReviewModal from "@/app/components/viewReviewModal";
-import InfiniteScroll from "react-infinite-scroll-component";
+import Reviews from "@/app/components/reviews";
 
 
 
@@ -184,6 +184,12 @@ export default function TowerPage({
     fetchReviews();
   }, [tower]);
 
+  const openWiki = (tower: Tower) => {
+    const link: string = "https://jtoh.fandom.com/wiki/" + tower.name.replace(/ /g, '_');
+    window.open(link, '_blank');
+  }
+
+
   const fetchMoreReviews = async () => {
     if (!reviewsNextUrl) return;
 
@@ -243,7 +249,7 @@ export default function TowerPage({
             </button>}
 
             {dropdownOpen && (
-              <div className="flex flex-col bg-zinc-800 border rounded-lg shadow-lg mt-1 w-50 py-4">
+              <div className="sm:absolute sm:top-140 mt-2 flex flex-col bg-zinc-800 border rounded-lg shadow-lg w-50 py-4">
                 {(towerStatus !== "bookmarked") && <button onClick={() => setStatus("bookmarked")} className="hover:bg-zinc-500 cursor-pointer h-10 text-xl">Set as Planned</button>}
                 {(towerStatus !== "ignored") && <button onClick={() => setStatus("ignored")} className="hover:bg-zinc-500 cursor-pointer h-10 text-xl">Set as Ignored</button>}
                 {(towerStatus !== "incomplete") && <button onClick={() => setStatus("incomplete")} className="hover:bg-zinc-500 cursor-pointer h-10 text-xl">Remove from List</button>}
@@ -271,6 +277,10 @@ export default function TowerPage({
 
               </div>
             )}
+
+            <button className="w-40 h-16 rounded border bg-blue-600 mt-4 text-xl text-outline hover:bg-blue-500 cursor-pointer" onClick={() => openWiki(tower)}>
+              Wiki Page
+            </button>
           </div>
           <div className="md:ml-10 mt-5 md:mt-0">
             <span className="text-xl md:text-4xl font-bold text-outline">{tower.name}</span>
@@ -296,50 +306,17 @@ export default function TowerPage({
               <span className="ml-18 text-white text-2xl md:text-3xl text-outline">{tower.score} / 100</span>
             </div>
             <div className="flex flex-col md:flex-row mt-8 md:mt-20">
-              <div className="w-80 h-80 md:w-100 bg-zinc-900 border-white border-2 rounded-md">
-                <div className="w-full h-10 flex justify-between items-center px-4 border-b border-white">
-                  <span className="text-xl text-outline">Reviews</span>
-                  {isAuthenticated && towerStatus == "completed" && !userReview && <button className="bg-zinc-700 px-2 py-1 rounded-md hover:bg-zinc-500" onClick={() => setReviewWindow(true)}>Write a Review</button>}
-                  {isAuthenticated && towerStatus == "completed" && userReview && <button className="bg-blue-600 px-2 py-1 rounded-md hover:bg-blue-500" onClick={() => setSelectedReview(userReview)}>View My Review</button>}
-                </div>
+              <Reviews
+                isAuthenticated={isAuthenticated}
+                towerStatus={towerStatus || ""}
+                userReview={userReview}
+                reviews={reviews}
+                hasMoreReviews={hasMoreReviews}
+                fetchMoreReviews={fetchMoreReviews}
+                setReviewWindow={setReviewWindow}
+                setSelectedReview={setSelectedReview}
+              />
 
-                <div id="reviews-scrollable" className="h-65 overflow-y-auto">
-                  <InfiniteScroll
-                    dataLength={reviews.length}
-                    next={fetchMoreReviews}
-                    hasMore={hasMoreReviews}
-                    loader={<div className="text-center py-2">Loading...</div>}
-                    scrollableTarget="reviews-scrollable"
-                  >
-                    {reviews.map((review) => (
-                      <div
-                        key={review.id}
-                        className="pt-4 pl-4 pr-4 border-b border-zinc-700 cursor-pointer hover:bg-zinc-800 transition"
-                        onClick={() => setSelectedReview(review)}
-                      >
-                        <div className="flex items-center justify-between mb-2">
-                          <div className="flex items-center gap-2">
-                            {review.profile.avatar_url && (
-                              <img
-                                src={review.profile.avatar_url}
-                                alt={`${review.profile.username}'s avatar`}
-                                className="h-12 w-12 border-2 border-white rounded-md"
-                              />
-                            )}
-                            <span className="text-xl font-bold text-outline">{review.profile.username}</span>
-                          </div>
-                          <span className="text-yellow-500">{review.score}/100</span>
-                        </div>
-                        {review.summary && (
-                          <div className="overflow-x-auto pb-3">
-                            <p className="text-sm font-semibold text-outline whitespace-nowrap">{review.summary}</p>
-                          </div>
-                        )}
-                      </div>
-                    ))}
-                  </InfiniteScroll>
-                </div>
-              </div>
               <div className="h-80 w-80 bg-zinc-900 md:ml-10 border-white border-2 rounded-md mt-8 md:mt-0 ">
                 <div className="w-full flex flex-col border-b border-white h-10 justify-center">
                   <span className="text-xl px-4 text-outline">Creators</span>
