@@ -5,8 +5,6 @@ import { useAuth } from "@/app/hooks/useAuth";
 import { useEffect, useState } from "react";
 import { getTowerImageUrl, getTowerAreaImage, diffColors, getTowerDifficultyWord, Tower, getTowerAreaBanner } from "@/app/utils/towers";
 import { fetchWithAuth } from "@/app/utils/auth";
-import ReviewModal from "@/app/components/reviewModal";
-import ViewReviewModal from "@/app/components/viewReviewModal";
 import Reviews from "@/app/components/reviews";
 
 
@@ -34,11 +32,6 @@ export default function TowerPage({
   const isAuthenticated = useAuth();
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [completeDropdown, setCompleteDropdown] = useState(false);
-  const [reviewWindow, setReviewWindow] = useState(false);
-  const [reviews, setReviews] = useState<Review[]>([]);
-  const [selectedReview, setSelectedReview] = useState<Review | null>(null);
-  const [reviewsNextUrl, setReviewsNextUrl] = useState<string | null>(null);
-  const [hasMoreReviews, setHasMoreReviews] = useState(true);
   const [userReview, setUserReview] = useState<Review | null>(null);
   const [score, setScore] = useState<number | "">(50);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -165,45 +158,12 @@ export default function TowerPage({
     fetchTowerCompletion()
   }, [tower, isAuthenticated]);
 
-  useEffect(() => {
-    async function fetchReviews() {
-      if (!tower) return;
-
-      try {
-        const url = `${API_BASE_URL}/api/towers/${tower.id}/reviews/?limit=5`;
-        const res = await fetch(url);
-        const data = await res.json();
-
-        setReviews(data.results || []);
-        setReviewsNextUrl(data.next);
-        setHasMoreReviews(Boolean(data.next));
-      } catch (error) {
-        console.error('Failed to fetch reviews:', error);
-      }
-    }
-    fetchReviews();
-  }, [tower]);
 
   const openWiki = (tower: Tower) => {
     const link: string = "https://jtoh.fandom.com/wiki/" + tower.name.replace(/ /g, '_');
     window.open(link, '_blank');
   }
 
-
-  const fetchMoreReviews = async () => {
-    if (!reviewsNextUrl) return;
-
-    try {
-      const res = await fetch(reviewsNextUrl);
-      const data = await res.json();
-
-      setReviews(prev => [...prev, ...(data.results || [])]);
-      setReviewsNextUrl(data.next);
-      setHasMoreReviews(Boolean(data.next));
-    } catch (error) {
-      console.error('Failed to fetch more reviews:', error);
-    }
-  };
 
   if (error) return <div>{error}</div>;
   if (!tower) return <div>Loading...</div>;
@@ -310,11 +270,7 @@ export default function TowerPage({
                 isAuthenticated={isAuthenticated}
                 towerStatus={towerStatus || ""}
                 userReview={userReview}
-                reviews={reviews}
-                hasMoreReviews={hasMoreReviews}
-                fetchMoreReviews={fetchMoreReviews}
-                setReviewWindow={setReviewWindow}
-                setSelectedReview={setSelectedReview}
+                tower={tower}
               />
 
               <div className="h-80 w-80 bg-zinc-900 md:ml-10 border-white border-2 rounded-md mt-8 md:mt-0 ">
@@ -346,22 +302,7 @@ export default function TowerPage({
             </div>
           </div>
         </div>
-
       </div>
-      {reviewWindow && (
-        <ReviewModal
-          onClose={() => setReviewWindow(false)}
-          towerId={tower.id}
-        />
-      )}
-      {selectedReview && (
-        <ViewReviewModal
-          review={selectedReview}
-          towerId={tower.id}
-          isOwnReview={userReview?.id === selectedReview.id}
-          onClose={() => setSelectedReview(null)}
-        />
-      )}
     </>
   );
 }
