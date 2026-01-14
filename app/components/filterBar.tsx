@@ -110,12 +110,14 @@ export default function FilterBar({
             setCompletedToggle={setCompletedToggle}
             />
           }
-        </div>
-        <div>
-          <button className="w-30 h-15 bg-zinc-700 text-white rounded hover:bg-zinc-400 transition ml-4" onClick={handleReset}>
+          <div className="relative flex justify-center">
+          <button className="w-30 h-15 bg-zinc-700 text-white rounded hover:bg-zinc-400 transition" onClick={handleReset}>
             Reset Filters
           </button>
         </div>
+          
+        </div>
+        
 
     </div>
     );
