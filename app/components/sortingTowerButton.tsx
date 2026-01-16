@@ -1,5 +1,6 @@
-import { useState } from "react"
+import { useState, useRef } from "react"
 import { SortState } from "../utils/towers";
+import { useClickOutside } from "../utils/clickOutside";
 
 
 interface SortingTowerButtonProps {
@@ -9,6 +10,10 @@ interface SortingTowerButtonProps {
 
 export default function SortingTowerButton({sortMode, setSortMode}: SortingTowerButtonProps) {
     const [sortPopup, setSortPopup] = useState(false);
+    const popupRef = useRef<HTMLDivElement>(null);
+    
+    useClickOutside(popupRef, () => setSortPopup(false));
+    
     return (
         <div>
             <button className="w-15 h-15 bg-zinc-700 text-white rounded hover:bg-zinc-400 transition mx-4 flex items-center justify-center" onClick={() => setSortPopup(!sortPopup)}>
@@ -17,13 +22,13 @@ export default function SortingTowerButton({sortMode, setSortMode}: SortingTower
                 </svg>
             </button>
             {sortPopup &&
-                <div className="absolute -ml-5 w-35 bg-zinc-800 flex flex-col mt-2 z-50 rounded px-2 py-2">
-                    <button className = "mb-1 text-xl cursor-pointer" onClick={() => {setSortMode(prev => prev === 'scoreUp' ? 'scoreDown' : 'scoreUp')}}>
+                <div ref={popupRef} className="absolute -ml-5 w-35 bg-zinc-800 flex flex-col mt-2 z-50 rounded px-2 py-2">
+                    <button className = "mb-1 text-xl cursor-pointer" onClick={() => {setSortMode(prev => prev === 'scoreDown' ? 'scoreUp' : 'scoreDown')}}>
                         Score {sortMode === 'scoreUp' ? '↑' : sortMode === 'scoreDown' ? '↓' : ''}
                     </button>
                     <button className = "mb-1 text-xl cursor-pointer" onClick={() => {
                         setSortMode(prev =>
-                            prev === 'difficultyUp' ? 'difficultyDown' : 'difficultyUp'
+                            prev === 'difficultyDown' ? 'difficultyUp' : 'difficultyDown'
                         )
                     }}>
                         Difficulty {sortMode === 'difficultyUp' ? '↑' : sortMode === 'difficultyDown' ? '↓' : ''}
