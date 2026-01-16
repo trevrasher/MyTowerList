@@ -4,6 +4,10 @@ import AreaFilter from "./areaFilter";
 import CompletedFilter from "./completedFilter";
 import SearchBar from "./searchBar";
 import { areas } from "../utils/towers";
+import SortingTowerButton from "./sortingTowerButton";
+import { SortState } from "../utils/towers";
+
+
 
 
 
@@ -18,6 +22,8 @@ interface FilterBarProps {
   isAuthenticated: boolean
   onSearch: (query: string) => void;
   searchQuery: string;
+  sortMode: SortState;
+  setSortMode: (value: SortState | ((prev: SortState) => SortState)) => void;
 }
 
 
@@ -31,7 +37,9 @@ export default function FilterBar({
     setCompletedToggle,
     isAuthenticated,
     onSearch,
-    searchQuery
+    searchQuery,
+    sortMode,
+    setSortMode
     }: FilterBarProps) {
 
     const [filterSelect, setFilterSelect] = useState<String>("");
@@ -118,7 +126,8 @@ export default function FilterBar({
           
         </div>
         
-
+          <SortingTowerButton sortMode={sortMode}
+          setSortMode={setSortMode}></SortingTowerButton>
     </div>
     );
 }

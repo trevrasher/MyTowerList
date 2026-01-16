@@ -48,7 +48,23 @@ class TowerListView(generics.ListAPIView):
                         search in tower.name.lower() or
                         search == get_acronym(tower.name)]
             
+        ordering = self.request.query_params.get('ordering', '-score')
+        valid_orderings = {
+            'name': 'name',
+            '-name': '-name',
+            'difficulty': 'difficulty',
+            '-difficulty': '-difficulty',
+            'score': 'score',
+            '-score': '-score'
+        }
+        
+        if ordering in valid_orderings and not isinstance(queryset, list):
+            queryset = queryset.order_by(valid_orderings[ordering], 'id')
+        elif not isinstance(queryset, list):
+            queryset = queryset.order_by('-score', 'id')
+            
         return queryset
+    
 
 
 class GetAllTowersByScore(generics.ListAPIView):

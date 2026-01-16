@@ -9,18 +9,31 @@ import MainHeader from "./components/mainHeader";
 import { useAuth } from "./hooks/useAuth";
 import { fetchWithAuth } from "./utils/auth";
 import { Tower, areas, diffColors, getTowerDifficultyWord, getTowerImageUrl } from "./utils/towers";
+import { SortState } from "./utils/towers";
+
+
 
 interface TowerStatus {
   tower_id: number;
   status: string;
 }
 
+const sortToOrdering = (sortMode: SortState): string => {
+  const mapping: Record<SortState, string> = {
+    'scoreUp': 'score',
+    'scoreDown': '-score',
+    'difficultyUp': 'difficulty',
+    'difficultyDown': '-difficulty',
+  };
+  return mapping[sortMode];
+};
 
 function buildQueryParams(
   selectedAreas: string[],
   difficultyRange: number[],
   completedToggle: boolean,
-  towerStatuses: Map<number, string>
+  towerStatuses: Map<number, string>,
+  sortMode: SortState
 ) {
   const params = new URLSearchParams();
   if (selectedAreas.length && selectedAreas.length !== areas.length) {
@@ -40,9 +53,14 @@ function buildQueryParams(
     if (status === 'ignored') {
       params.append("ignored_ids", id.toString());
     }
-    });
+  });
+  
+  if (sortMode) {
+    params.append("ordering", sortToOrdering(sortMode));
+  }
   return `${API_BASE_URL}/api/towers/?${params.toString()}`;
 }
+
 
 export default function Home() {
   const [towers, setTowers] = useState<Tower[]>([]);
@@ -56,6 +74,7 @@ export default function Home() {
   const [loading, setLoading] = useState(false);
   const [completedTowersLoaded, setCompletedTowersLoaded] = useState<boolean>(false);
   const [searchQuery, setSearchQuery] = useState<string>("");
+  const [sortMode, setSortMode] = useState<SortState>('scoreDown');
 
   const handleSearch = (query: string) => {
     setSearchQuery(query);
@@ -86,14 +105,14 @@ export default function Home() {
   useEffect(() => {
     if (!completedTowersLoaded) return;
     setTowers([]);
-    let url = buildQueryParams(selectedAreas, difficultyRange, completedToggle, towerStatuses);
+    let url = buildQueryParams(selectedAreas, difficultyRange, completedToggle, towerStatuses, sortMode);
     if (searchQuery) {
       url += `&search=${encodeURIComponent(searchQuery)}`;
     }
     setNextUrl(url);
     setHasMore(true);
     fetchTowersPage(url, true);
-  }, [selectedAreas, difficultyRange, completedToggle, towerStatuses, completedTowersLoaded, searchQuery]);
+  }, [selectedAreas, difficultyRange, completedToggle, towerStatuses, completedTowersLoaded, searchQuery, sortMode]);
 
 
 
@@ -130,6 +149,8 @@ export default function Home() {
         isAuthenticated={isAuthenticated}
         onSearch={handleSearch}
         searchQuery={searchQuery}
+        sortMode={sortMode}
+        setSortMode={setSortMode}
       />
       <InfiniteScroll
         dataLength={towers.length}

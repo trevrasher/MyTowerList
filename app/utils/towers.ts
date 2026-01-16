@@ -95,3 +95,5 @@ export function getTowerAreaBanner(towerArea: string) {
     const fileName = towerArea.replace(/ /g, "").replace(/ö/g, "o") + ".png";
     return `https://raw.githubusercontent.com/trevrasher/MyTowerList/refs/heads/master/assets/area_banners/${fileName}`;
 }
+
+export type SortState =  'scoreUp' | 'scoreDown' | 'difficultyUp' | 'difficultyDown';
