@@ -3,28 +3,12 @@ import MainHeader from "@/app/components/mainHeader";
 import { useAuth } from "@/app/hooks/useAuth";
 import { use, useEffect, useState } from "react";
 import { API_BASE_URL } from "@/next.config";
-import { Tower } from "@/app/utils/towers";
-import ErrorPopup from "@/app/components/errorPopup";
-import { getTowerImageUrl } from "@/app/utils/towers";
 
-interface ProfileData {
-    roblox_user_id: number | null;
-    username: string;
-    avatar_url: string | null;
-    completed: {
-        count: number;
-        towers: Tower[];
-    };
-    bookmarked: {
-        count: number;
-        towers: Tower[];
-    };
-    ignored: {
-        count: number;
-        towers: Tower[];
-    };
-    review_scores: Record<number, number>;
-}
+import { getTowerImageUrl } from "@/app/utils/towers";
+import { ProfileData } from "@/app/utils/profile";
+import TotalTracker from "@/app/components/profile/totalTracker";
+import DiffOverview from "@/app/components/profile/diffOverview";
+
 
 
 export default function ProfilePage({ params }: { params: Promise<{ name: string }> }) {
@@ -62,6 +46,8 @@ export default function ProfilePage({ params }: { params: Promise<{ name: string
 
     return (
         <div>
+            <TotalTracker profileData={profileData}/>
+            <DiffOverview profileData={profileData}/>
             <MainHeader isAuthenticated={isAuthenticated} />
             <div className="flex flex-col w-[60vw] mx-auto">
                 <div className="flex justify-start items-center pb-10">

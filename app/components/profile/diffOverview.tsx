@@ -1,0 +1,63 @@
+import { ProfileData } from "@/app/utils/profile"
+import { diffColors } from "@/app/utils/towers";
+
+interface DiffOverviewProps {
+    profileData: ProfileData | null
+}
+
+function getDiffCategoryCounts(towers: ProfileData['completed']['towers']) {
+    const counts: Record<string, number> = {};
+    const percentages: Record<string, number> = {};
+    const total = towers.length;
+
+    towers.forEach(tower => {
+        counts[tower.diff_category] = (counts[tower.diff_category] || 0) + 1;
+    });
+
+    Object.entries(counts).forEach(([category, count]) => {
+        percentages[category] = total > 0 ? (count / total) * 100 : 0;
+    });
+
+    return percentages;
+}
+
+export default function DiffOverview({ profileData }: DiffOverviewProps) {
+    const nonScCount = profileData?.completed.towers.filter(tower => tower.difficulty < 8).length ?? 0;
+    const scCount = profileData?.completed.towers.filter(tower => tower.difficulty >= 8).length ?? 0;
+    const diffPercentage = profileData ? getDiffCategoryCounts(profileData.completed.towers) : {};
+    return (
+        <div>
+            <div className="w-120 h-30 flex flex-col rounded bg-zinc-700 ">
+                <div className="flex my-auto">
+                    <div className="flex flex-col my-auto mx-auto">
+                        <span className="text-3xl text-outline mx-auto">{nonScCount}</span>
+                        <span className="text-m text-zinc-400">Non-SC</span>
+                    </div>
+
+
+                    <div className="flex flex-col my-auto mx-auto">
+                        <span className="text-3xl text-outline mx-auto">
+                            {scCount}
+                        </span>
+                        <span className="text-m text-zinc-400" >SC</span>
+                    </div>
+                </div>
+                <div className="w-full h-4 flex rounded overflow-hidden bg-zinc-800 mt-auto">
+                    {Object.keys(diffColors)
+                        .filter(category => diffPercentage[category] > 0)
+                        .map(category => (
+                            <div
+                                key={category}
+                                style={{
+                                    width: `${diffPercentage[category]}%`,
+                                    backgroundColor: diffColors[category]
+                                }}
+                                title={`${category}: ${diffPercentage[category].toFixed(1)}%`}
+                            />
+                        ))}
+                </div>
+
+            </div>
+        </div>
+    )
+}
