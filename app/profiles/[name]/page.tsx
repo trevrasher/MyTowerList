@@ -8,7 +8,7 @@ import { getTowerImageUrl } from "@/app/utils/towers";
 import { ProfileData } from "@/app/utils/profile";
 import TotalTracker from "@/app/components/profile/totalTracker";
 import DiffOverview from "@/app/components/profile/diffOverview";
-
+import { diffColors } from "@/app/utils/towers";
 
 
 export default function ProfilePage({ params }: { params: Promise<{ name: string }> }) {
@@ -46,8 +46,8 @@ export default function ProfilePage({ params }: { params: Promise<{ name: string
 
     return (
         <div>
-            <TotalTracker profileData={profileData}/>
-            <DiffOverview profileData={profileData}/>
+            <TotalTracker profileData={profileData} />
+            <DiffOverview profileData={profileData} />
             <MainHeader isAuthenticated={isAuthenticated} />
             <div className="flex flex-col w-[60vw] mx-auto">
                 <div className="flex justify-start items-center pb-10">
@@ -58,13 +58,13 @@ export default function ProfilePage({ params }: { params: Promise<{ name: string
                     <span className="pb-5 text-outline text-3xl">Completed</span>
                     <div className=" bg-zinc-800 p-10 rounded-2xl w-[40vw]">
 
-                        <div className="grid grid-cols-[5vw_25vw_5vw] gap-4 font-bold mb-10">
-                            <span className="text-zinc-300 text-xl">Image</span>
-                            <span className="text-zinc-300 text-xl">Tower Name</span>
+                        <div className="grid grid-cols-[5vw_20vw_5vw_5vw] gap-4 font-bold mb-5">
+                            <span className="text-zinc-300 text-xl"></span>
+                            <span className="text-zinc-300 text-xl">Name</span>
                             <span className="text-zinc-300 text-xl">Score</span>
-
+                            <span className="text-zinc-300 text-xl">Review</span>
                         </div>
-                        <div className="grid grid-cols-[5vw_25vw_5vw] gap-4">
+                        <div className="grid grid-cols-[5vw_20vw_5vw_5vw] gap-4">
                             {profileData?.completed.towers
                                 .sort((a, b) => {
                                     const scoreA = profileData.review_scores[a.id];
@@ -84,9 +84,12 @@ export default function ProfilePage({ params }: { params: Promise<{ name: string
                                 })
                                 .map((tower) => (
                                     <div key={tower.id} className="contents">
-                                        <img src={getTowerImageUrl(tower.name)} className="h-15 w-11 rounded-md"></img>
-                                        <span className="text-zinc-300 mt-4">{tower.name}</span>
+                                        <img src={getTowerImageUrl(tower.name)} className="h-14 w-14 rounded-md object-cover"></img>
+                                        <span className={`mt-4 text-l ${tower.diff_category === 'intense' ? 'text-outline-white' : 'text-outline'}`} style={{ color: diffColors[tower.diff_category] }}>{tower.name}</span>
                                         <span className="text-zinc-300 ml-4">{profileData?.review_scores[tower.id]}</span>
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="ml-6 w-6 h-6">
+                                            <path strokeLinecap="round" strokeLinejoin="round" d="M8.625 12a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H8.25m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H12m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0h-.375M21 12c0 4.556-4.03 8.25-9 8.25a9.764 9.764 0 01-2.555-.337A5.972 5.972 0 015.41 20.97a5.969 5.969 0 01-.474-.065 4.48 4.48 0 00.978-2.025c.09-.457-.133-.901-.467-1.226C3.93 16.178 3 14.189 3 12c0-4.556 4.03-8.25 9-8.25s9 3.694 9 8.25z" />
+                                        </svg>
 
                                     </div>
                                 ))

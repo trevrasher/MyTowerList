@@ -42,7 +42,7 @@ export default function DiffOverview({ profileData }: DiffOverviewProps) {
                         <span className="text-m text-zinc-400" >SC</span>
                     </div>
                 </div>
-                <div className="w-full h-4 flex rounded overflow-hidden bg-zinc-800 mt-auto">
+                <div className="w-full h-4 flex rounded overflow-hidden bg-zinc-800 mt-auto border-2 border-black">
                     {Object.keys(diffColors)
                         .filter(category => diffPercentage[category] > 0)
                         .map(category => (

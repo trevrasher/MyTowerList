@@ -25,7 +25,7 @@ export default function TotalTracker({ profileData }: TotalTrackerProps) {
         const hardestValue = hardestTower.difficulty
         const hardestColor = diffColors[hardestTower.diff_category];
         const scores = Object.values(profileData.review_scores);
-        const meanScore = scores.length > 0 ? scores.reduce((sum, score) => sum + score, 0) / scores.length : 0;
+        const meanScore = scores.length > 0 ? Math.round(scores.reduce((sum, score) => sum + score, 0) / scores.length) : 0;
 
 
 
