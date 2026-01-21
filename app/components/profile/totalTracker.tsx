@@ -31,7 +31,7 @@ export default function TotalTracker({ profileData }: TotalTrackerProps) {
 
 
         return (
-            <div className="w-120 h-30 flex rounded bg-zinc-700 ">
+            <div className="w-120 h-30 flex rounded-2xl bg-zinc-800 ">
                 <div className="flex flex-col my-auto mx-auto">
                     <span className="text-3xl text-outline mx-auto">{profileData.completed.count}</span>
                     <span className="text-m text-zinc-400">Completed Towers</span>

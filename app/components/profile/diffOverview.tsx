@@ -27,8 +27,8 @@ export default function DiffOverview({ profileData }: DiffOverviewProps) {
     const diffPercentage = profileData ? getDiffCategoryCounts(profileData.completed.towers) : {};
     return (
         <div>
-            <div className="w-120 h-30 flex flex-col rounded bg-zinc-700 ">
-                <div className="flex my-auto">
+            <div className="w-120 h-30 flex flex-col rounded-2xl bg-zinc-800 ">
+                <div className="flex mt-6">
                     <div className="flex flex-col my-auto mx-auto">
                         <span className="text-3xl text-outline mx-auto">{nonScCount}</span>
                         <span className="text-m text-zinc-400">Non-SC</span>
@@ -42,7 +42,7 @@ export default function DiffOverview({ profileData }: DiffOverviewProps) {
                         <span className="text-m text-zinc-400" >SC</span>
                     </div>
                 </div>
-                <div className="w-full h-4 flex rounded overflow-hidden bg-zinc-800 mt-auto border-2 border-black">
+                <div className="w-full h-4 flex rounded-2xl overflow-hidden bg-zinc-800 mt-auto border-2 border-black">
                     {Object.keys(diffColors)
                         .filter(category => diffPercentage[category] > 0)
                         .map(category => (

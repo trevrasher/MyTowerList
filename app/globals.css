@@ -68,22 +68,22 @@ body {
 .text-outline-white {
   color: black; 
   text-shadow: 
-    -1px -1px 0 #444444,
-     0   -1px 0 #444444,
-     1px -1px 0 #444444,
-     1px  0   0 #444444,
-     1px  1px 0 #444444,
-     0    1px 0 #444444,
-    -1px  1px 0 #444444,
-    -1px  0   0 #444444,
-    -2px -2px 0 #444444,
-     0   -2px 0 #444444,
-     2px -2px 0 #444444,
-     2px  0   0 #444444,
-     2px  2px 0 #444444,
-     0    2px 0 #444444,
-    -2px  2px 0 #444444,
-    -2px  0   0 #444444;
+    -1px -1px 0 #5c5c5c,
+     0   -1px 0 #5c5c5c,
+     1px -1px 0 #5c5c5c,
+     1px  0   0 #5c5c5c,
+     1px  1px 0 #5c5c5c,
+     0    1px 0 #5c5c5c,
+    -1px  1px 0 #5c5c5c,
+    -1px  0   0 #5c5c5c,
+    -2px -2px 0 #5c5c5c,
+     0   -2px 0 #5c5c5c,
+     2px -2px 0 #5c5c5c,
+     2px  0   0 #5c5c5c,
+     2px  2px 0 #5c5c5c,
+     0    2px 0 #5c5c5c,
+    -2px  2px 0 #5c5c5c,
+    -2px  0   0 #5c5c5c;
 }
 
 .error {
