@@ -10,6 +10,13 @@ import TotalTracker from "@/app/components/profile/totalTracker";
 import DiffOverview from "@/app/components/profile/diffOverview";
 import { diffColors } from "@/app/utils/towers";
 
+interface SelectedReview {
+    towerName: string;
+    review: string;
+    summary: string;
+    score: number;
+}
+
 
 export default function ProfilePage({ params }: { params: Promise<{ name: string }> }) {
     const isAuthenticated = useAuth();
@@ -17,6 +24,7 @@ export default function ProfilePage({ params }: { params: Promise<{ name: string
     const [profileData, setProfileData] = useState<ProfileData | null>(null);
     const [error, setError] = useState<string | null>(null);
     const [loading, setLoading] = useState(true);
+    const [selectedReview, setSelectedReview] = useState<SelectedReview | null>(null)
 
     useEffect(() => {
         async function fetchProfileData() {
@@ -88,9 +96,24 @@ export default function ProfilePage({ params }: { params: Promise<{ name: string
                                             <img src={getTowerImageUrl(tower.name)} className="h-14 w-14 rounded-md object-cover "></img>
                                             <span className={` mt-4 text-l ${tower.diff_category === 'intense' ? 'text-outline-white' : 'text-outline'}`} style={{ color: diffColors[tower.diff_category] }}>{tower.name}</span>
                                             <span className="text-zinc-300 ml-4 mt-4 ">{profileData?.review_scores[tower.id]}</span>
-                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="ml-6 w-6 h-6 mt-4">
-                                                <path strokeLinecap="round" strokeLinejoin="round" d="M8.625 12a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H8.25m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H12m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0h-.375M21 12c0 4.556-4.03 8.25-9 8.25a9.764 9.764 0 01-2.555-.337A5.972 5.972 0 015.41 20.97a5.969 5.969 0 01-.474-.065 4.48 4.48 0 00.978-2.025c.09-.457-.133-.901-.467-1.226C3.93 16.178 3 14.189 3 12c0-4.556 4.03-8.25 9-8.25s9 3.694 9 8.25z" />
-                                            </svg>
+                                            {profileData?.tower_reviews?.[tower.id] && (
+                                                <button
+                                                    onClick={() => {
+                                                        setSelectedReview({
+                                                            towerName: tower.name,
+                                                            review: profileData.tower_reviews[tower.id].review_text,
+                                                            summary: profileData.tower_reviews[tower.id].summary,
+                                                            score: profileData.review_scores[tower.id]
+                                                        });
+                                                    }}
+                                                    className="ml-6 w-6 h-6 mt-4 hover:opacity-70 transition cursor-pointer"
+                                                >
+                                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+                                                        <path strokeLinecap="round" strokeLinejoin="round" d="M8.625 12a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H8.25m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H12m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0h-.375M21 12c0 4.556-4.03 8.25-9 8.25a9.764 9.764 0 01-2.555-.337A5.972 5.972 0 015.41 20.97a5.969 5.969 0 01-.474-.065 4.48 4.48 0 00.978-2.025c.09-.457-.133-.901-.467-1.226C3.93 16.178 3 14.189 3 12c0-4.556 4.03-8.25 9-8.25s9 3.694 9 8.25z" />
+                                                    </svg>
+                                                </button>
+                                            )}
+                                            {!profileData?.tower_reviews?.[tower.id] && <div className="ml-6 w-6 h-6 mt-4"></div>}
 
                                         </div>
                                     ))
@@ -103,7 +126,7 @@ export default function ProfilePage({ params }: { params: Promise<{ name: string
                             <TotalTracker profileData={profileData} />
                         </div>
                         <div className="mb-4">
-                        <DiffOverview profileData={profileData} />
+                            <DiffOverview profileData={profileData} />
                         </div>
                         <span className="pb-5 text-outline text-xl">Planned</span>
                     </div>

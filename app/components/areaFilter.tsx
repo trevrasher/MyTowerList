@@ -1,5 +1,4 @@
 import AutoAreaFilterButton from "./autoAreaFilterButton";
-import { areas } from "../utils/towers";
 
 interface AreaFilterProps {
     areas: string[]

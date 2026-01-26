@@ -10,14 +10,19 @@ interface MainHeaderProps {
 
 export default function MainHeader({ isAuthenticated }: MainHeaderProps) {
     const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
+    const [username, setUsername] = useState<string | null>(null);
 
     useEffect(() => {
         if (isAuthenticated) {
             const cachedAvatar = localStorage.getItem("avatar_url");
-            if (cachedAvatar) {
+            const cachedUsername = localStorage.getItem("username");
+            
+            if (cachedAvatar && cachedUsername) {
                 setAvatarUrl(cachedAvatar);
+                setUsername(cachedUsername);
                 return;
             }
+            
             fetch(`${API_BASE_URL}/api/profile`, {
                 credentials: "include",
                 headers: { "Authorization": `Bearer ${localStorage.getItem("access_token")}` }
@@ -25,9 +30,16 @@ export default function MainHeader({ isAuthenticated }: MainHeaderProps) {
                 .then(res => res.json())
                 .then((res) => {
                     const url = res.avatar_url || null;
+                    const user = res.username || null;
+                    
                     setAvatarUrl(url);
+                    setUsername(user);
+                    
                     if (url) {
                         localStorage.setItem("avatar_url", url);
+                    }
+                    if (user) {
+                        localStorage.setItem("username", user);
                     }
                 });
         }
@@ -46,10 +58,10 @@ export default function MainHeader({ isAuthenticated }: MainHeaderProps) {
                     {isAuthenticated && <SyncButton />}
                     <LoginButton />
                 </div>
-                {isAuthenticated &&
-                    <div className="ml-2 md:ml-4">
-                        {avatarUrl && <img src={avatarUrl} alt="Roblox Avatar" className="w-15 h-15 border-2 rounded-md" />}
-                    </div>
+                {isAuthenticated && username &&
+                    <Link href={`/profiles/${username}`} className="ml-2 md:ml-4">
+                        {avatarUrl && <img src={avatarUrl} alt="Roblox Avatar" className="w-15 h-15 border-2 rounded-md cursor-pointer hover:opacity-80 transition" />}
+                    </Link>
                 }
             </div>
         </div>

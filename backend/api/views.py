@@ -380,7 +380,21 @@ class GetFullProfile(APIView):
                 tower_id__in=completed_tower_ids
             ).values_list('tower_id', 'score')
         ) if completed_tower_ids else {}
-        
+
+        tower_reviews = {}
+        if completed_tower_ids:
+            reviews = TowerReview.objects.filter(
+                profile=profile,
+                tower_id__in=completed_tower_ids,
+                review_text__isnull=False
+            ).exclude(review_text='').values('tower_id', 'review_text', 'summary')
+            
+            for review in reviews:
+                tower_reviews[review['tower_id']] = {
+                    'review_text': review['review_text'],
+                    'summary': review['summary']
+                }
+
         return Response({
             "roblox_user_id": roblox_user_id,
             "username": user.username,
@@ -397,5 +411,6 @@ class GetFullProfile(APIView):
                 "count": len(ignored_list),
                 "towers": TowerSerializer(ignored_list, many=True).data
             },
-            "review_scores": review_scores
+            "review_scores": review_scores,
+            "tower_reviews": tower_reviews  
         })

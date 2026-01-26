@@ -20,7 +20,7 @@ export type Creator = {
 export const areas = [
   'Ring 0', 'Ring 1', 'Ring 2', 'Ring 3', 'Ring 4', 'Ring 5', 'Ring 6', 'Ring 7', 'Ring 8', 'Ring 9',
   'Zone 1', 'Zone 2', 'Zone 3', 'Zone 4', 'Zone 5', 'Zone 6', 'Zone 7', 'Zone 8', 'Zone 9', 'Zone 10',
-  'Arcane Area', 'Ashen Towerworks', 'Forgotten Ridge', 'Garden of Eeshöl', 'Lost River',
+  'Arcane Area', 'Steelspire Horizon', 'Ashen Towerworks', 'Forgotten Ridge', 'Garden of Eeshöl', 'Lost River',
   'Paradise Atoll', 'Silent Abyss', 'The Starlit Archives'
 ];
 
