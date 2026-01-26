@@ -7,11 +7,28 @@ import re
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'config.settings')
 django.setup()
 
-def extract_stats_from_html(html_source):
-    response = requests.get(html_source)
+def extract_stats_from_html(page_url):
+    if 'wiki/' in page_url:
+        page_name = page_url.split('wiki/')[-1]
+    else:
+        page_name = page_url
+    
+    api_url = "https://jtoh.fandom.com/api.php"
+    params = {
+        'action': 'parse',
+        'page': page_name,
+        'format': 'json'
+    }
+    
+    response = requests.get(api_url, params=params)
     response.raise_for_status()
-    html = response.text  
-
+    data = response.json()
+    
+    if 'error' in data:
+        print(f"  API Error: {data['error'].get('info', 'Unknown error')}")
+        return None
+    
+    html = data['parse']['text']['*']
     soup = BeautifulSoup(html, 'html.parser')
 
     tower_info = {
@@ -26,6 +43,7 @@ def extract_stats_from_html(html_source):
     aside = soup.find('aside', class_=['portable-infobox', 'pi-background', 'pi-border-color', 'pi-theme-wikia', 'pi-layout-default'])
 
     if not aside:
+        print("  Warning: No infobox found")
         return tower_info
     
     nameH2 = aside.find('h2')
