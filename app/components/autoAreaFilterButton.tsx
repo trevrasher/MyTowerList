@@ -1,3 +1,5 @@
+import { fetchWithAuth } from "@/app/utils/auth";
+
 type Props = {
   setSelectedAreas: (values: string[]) => void;
 };
@@ -5,13 +7,12 @@ type Props = {
 export default function AutoAreaFilterButton({ setSelectedAreas }: Props) {
 
     const handleClick = async () => {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/profile/available-areas/`, {
-            headers: {
-            'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
-            'Content-Type': 'application/json'
-        }});
-        const data = await res.json();
-        setSelectedAreas(data);
+        try {
+            const data = await fetchWithAuth(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/profile/available-areas/`);
+            setSelectedAreas(data);
+        } catch (error) {
+            console.error('Failed to fetch available areas:', error);
+        }
         
     }
 

@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import LoginButton from "./loginButton"
 import SyncButton from "./syncCompletions"
 import { API_BASE_URL } from "@/next.config";
+import { fetchWithAuth } from "@/app/utils/auth";
 import Link from "next/link";
 
 interface MainHeaderProps {
@@ -23,11 +24,7 @@ export default function MainHeader({ isAuthenticated }: MainHeaderProps) {
                 return;
             }
             
-            fetch(`${API_BASE_URL}/api/profile`, {
-                credentials: "include",
-                headers: { "Authorization": `Bearer ${localStorage.getItem("access_token")}` }
-            })
-                .then(res => res.json())
+            fetchWithAuth(`${API_BASE_URL}/api/profile`)
                 .then((res) => {
                     const url = res.avatar_url || null;
                     const user = res.username || null;
@@ -41,6 +38,9 @@ export default function MainHeader({ isAuthenticated }: MainHeaderProps) {
                     if (user) {
                         localStorage.setItem("username", user);
                     }
+                })
+                .catch((error) => {
+                    console.error('Failed to fetch profile:', error);
                 });
         }
     }, [isAuthenticated]);
@@ -60,7 +60,7 @@ export default function MainHeader({ isAuthenticated }: MainHeaderProps) {
                 </div>
                 {isAuthenticated && username &&
                     <Link href={`/profiles/${username}`} className="ml-2 md:ml-4">
-                        {avatarUrl && <img src={avatarUrl} alt="Roblox Avatar" className="w-15 h-15 border-2 rounded-md cursor-pointer hover:opacity-80 transition" />}
+                        {avatarUrl && <img src={avatarUrl} alt="Roblox Avatar" className="w-15 h-15 border-2 rounded-md cursor-pointer" />}
                     </Link>
                 }
             </div>

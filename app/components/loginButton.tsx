@@ -39,7 +39,7 @@ export default function LoginButton() {
     return (
       <button
         onClick={handleLogout}
-        className="bg-red-800 text-white px-4 py-2 rounded hover:bg-red-700 transition"
+        className="bg-red-800 text-white px-4 py-2 rounded hover:bg-red-700"
       >
         Logout
       </button>
@@ -49,7 +49,7 @@ export default function LoginButton() {
   return (
     <button
       onClick={handleLogin}
-      className="bg-zinc-600 text-white px-4 py-2 rounded hover:bg-zinc-400 transition"
+      className="bg-zinc-600 text-white px-4 py-2 rounded hover:bg-zinc-400"
     >
       Login with Roblox
     </button>

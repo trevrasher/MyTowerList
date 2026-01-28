@@ -1,5 +1,6 @@
 "use client"
 import { useState, useEffect } from 'react';
+import { fetchWithAuth } from '@/app/utils/auth';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8000";
 const COOLDOWN_MS = 60 * 1000;
@@ -32,24 +33,17 @@ export default function SyncButton() {
     setMessage('Syncing...');
 
     try {
-      const response = await fetch(`${API_BASE_URL}/api/sync-completions/`, {
+      const data = await fetchWithAuth(`${API_BASE_URL}/api/sync-completions/`, {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
         }
       });
 
-      const data = await response.json();
-
-      if (response.ok) {
-        setMessage(`Synced ${data.newly_completed_count} new towers!`);
-        setLastSync(now);
-        localStorage.setItem(LAST_SYNC_KEY, String(now));
-        window.location.reload();
-      } else {
-        setMessage(`Error: ${data.error || 'Failed to sync'}`);
-      }
+      setMessage(`Synced ${data.newly_completed_count} new towers!`);
+      setLastSync(now);
+      localStorage.setItem(LAST_SYNC_KEY, String(now));
+      window.location.reload();
     } catch (error) {
       setMessage('Network error occurred');
       console.error('Sync error:', error);
