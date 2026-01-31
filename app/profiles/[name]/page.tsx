@@ -178,6 +178,34 @@ export default function ProfilePage({ params }: { params: Promise<{ name: string
 
 
                         )}
+                        {!!profileData?.ignored.count && (
+                            <div className="flex flex-col mt-4">
+                                <span className="mb-2 text-outline text-xl">Ignored</span>
+
+                                <div className="flex flex-col gap-2 rounded-2xl bg-zinc-900">
+                                    {profileData?.ignored.towers.map((tower) => (
+                                        <div
+                                            key={tower.id}
+                                            className="flex items-center gap-4 rounded-2xl px-2 py-2  hover:bg-zinc-800 hover:cursor-pointer"
+                                            onClick={() => redirectToTower(tower.name, router)}
+                                        >
+                                            <img
+                                                className="h-14 w-14 rounded-md object-cover"
+                                                src={getTowerImageUrl(tower.name)}
+                                            />
+                                            <span
+                                                className={`${tower.diff_category === "intense" ? "text-outline-white" : "text-outline"}`}
+                                                style={{ color: diffColors[tower.diff_category] }}
+                                            >
+                                                {tower.name}
+                                            </span>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+
+
+                        )}
                     </div>
                 </div>
             </div>
