@@ -106,7 +106,7 @@ export default function ProfilePage({ params }: { params: Promise<{ name: string
                                             className="flex items-center gap-4 rounded-xl px-2 py-2 hover:bg-zinc-800 w-full hover:cursor-pointer"
                                             onClick={() => redirectToTower(tower.name, router)}
                                         >
-                                            <img src={getTowerImageUrl(tower.name)} className="h-14 w-14 rounded-md object-cover ml-5"></img>
+                                            <img src={getTowerImageUrl(tower.name)} className="h-14 w-14 rounded-md object-cover ml-5 border-1 border-black"></img>
                                             <span className={` text-l ${tower.diff_category === 'intense' ? 'text-outline-white' : 'text-outline'} `} style={{ color: diffColors[tower.diff_category] }}>{tower.name}</span>
                                             <span className="text-zinc-300 text-outline-gold ml-auto mr-10 ">{profileData?.review_scores[tower.id]}</span>
                                             {profileData?.tower_reviews?.[tower.id] && (
@@ -162,7 +162,7 @@ export default function ProfilePage({ params }: { params: Promise<{ name: string
                                             onClick={() => redirectToTower(tower.name, router)}
                                         >
                                             <img
-                                                className="h-14 w-14 rounded-md object-cover"
+                                                className="h-14 w-14 rounded-md object-cover border-1 border-black "
                                                 src={getTowerImageUrl(tower.name)}
                                             />
                                             <span
@@ -190,7 +190,7 @@ export default function ProfilePage({ params }: { params: Promise<{ name: string
                                             onClick={() => redirectToTower(tower.name, router)}
                                         >
                                             <img
-                                                className="h-14 w-14 rounded-md object-cover"
+                                                className="h-14 w-14 rounded-md object-cover border-1 border-black"
                                                 src={getTowerImageUrl(tower.name)}
                                             />
                                             <span
