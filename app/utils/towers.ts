@@ -3,7 +3,7 @@ export type Tower = {
   id: number;
   name: string;
   difficulty: number;
-  creators: Creator[]; 
+  creators: Creator[];
   floors: number;
   area: string;
   score: number;
@@ -52,7 +52,8 @@ export const areaAcronyms: { [key: string]: string } = {
   "Lost River": "LR",
   "Paradise Atoll": "PA",
   "Silent Abyss": "SA",
-  "The Starlit Archives": "TSA"
+  "The Starlit Archives": "TSA",
+  "Steelspire Horizon": "SsH"
 };
 
 export const diffColors: { [key: string]: string } = {
@@ -92,8 +93,16 @@ export function getTowerDifficultyWord(tower: Tower) {
 }
 
 export function getTowerAreaBanner(towerArea: string) {
-    const fileName = towerArea.replace(/ /g, "").replace(/ö/g, "o") + ".png";
-    return `https://raw.githubusercontent.com/trevrasher/MyTowerList/refs/heads/master/assets/area_banners/${fileName}`;
+  const fileName = towerArea.replace(/ /g, "").replace(/ö/g, "o") + ".png";
+  return `https://raw.githubusercontent.com/trevrasher/MyTowerList/refs/heads/master/assets/area_banners/${fileName}`;
 }
 
-export type SortState =  'scoreUp' | 'scoreDown' | 'difficultyUp' | 'difficultyDown';
+export function redirectToTower(
+  towerName: string,
+  router: { push: (href: string) => void }
+) {
+  const slug = encodeURIComponent(towerName);
+  router.push(`/towers/${slug}`);
+}
+
+export type SortState = 'scoreUp' | 'scoreDown' | 'difficultyUp' | 'difficultyDown';

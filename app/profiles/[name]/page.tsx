@@ -9,16 +9,25 @@ import { ProfileData } from "@/app/utils/profile";
 import TotalTracker from "@/app/components/profile/totalTracker";
 import DiffOverview from "@/app/components/profile/diffOverview";
 import { diffColors } from "@/app/utils/towers";
+import ViewReviewModal from "@/app/components/viewReviewModal";
+import { useRouter } from "next/navigation";
+import { redirectToTower } from "@/app/utils/towers";
+
+
 
 interface SelectedReview {
-    towerName: string;
-    review: string;
-    summary: string;
+    profile: {
+        username: string;
+        avatar_url: string | null
+    };
     score: number;
+    summary: string;
+    review_text: string;
 }
 
 
 export default function ProfilePage({ params }: { params: Promise<{ name: string }> }) {
+    const router = useRouter();
     const isAuthenticated = useAuth();
     const { name } = use(params);
     const [profileData, setProfileData] = useState<ProfileData | null>(null);
@@ -65,15 +74,15 @@ export default function ProfilePage({ params }: { params: Promise<{ name: string
 
                     <div className="flex flex-col mx-auto ">
                         <span className="pb-5 text-outline text-3xl">Completed</span>
-                        <div className=" bg-zinc-800 p-10 rounded-2xl w-[40vw]">
+                        <div className="bg-zinc-900 rounded-2xl w-[40vw] border-2">
 
-                            <div className="grid grid-cols-[5vw_20vw_5vw_5vw] gap-4 font-bold mb-5">
-                                <span className="text-zinc-300 text-xl"></span>
-                                <span className="text-zinc-300 text-xl">Name</span>
-                                <span className="text-zinc-300 text-xl">Score</span>
-                                <span className="text-zinc-300 text-xl">Review</span>
+                            <div className="flex items-center gap-4 font-bold mb-3 px-2 mt-1 border-b">
+                                <span className="h-14 w-14"></span>
+                                <span className="text-zinc-300 text-xl text-outline ml-5">Name</span>
+                                <span className="text-zinc-300 text-xl text-outline ml-auto">Score</span>
+                                <span className="text-zinc-300 text-xl text-outline ml-4 mr-5">Review</span>
                             </div>
-                            <div className="grid grid-cols-[5vw_20vw_5vw_5vw] gap-4">
+                            <div className="flex flex-col gap-2 w-full">
                                 {profileData?.completed.towers
                                     .sort((a, b) => {
                                         const scoreA = profileData.review_scores[a.id];
@@ -92,28 +101,41 @@ export default function ProfilePage({ params }: { params: Promise<{ name: string
                                         return 0;
                                     })
                                     .map((tower) => (
-                                        <div key={tower.id} className="contents">
-                                            <img src={getTowerImageUrl(tower.name)} className="h-14 w-14 rounded-md object-cover "></img>
-                                            <span className={` mt-4 text-l ${tower.diff_category === 'intense' ? 'text-outline-white' : 'text-outline'}`} style={{ color: diffColors[tower.diff_category] }}>{tower.name}</span>
-                                            <span className="text-zinc-300 ml-4 mt-4 ">{profileData?.review_scores[tower.id]}</span>
+                                        <div
+                                            key={tower.id}
+                                            className="flex items-center gap-4 rounded-xl px-2 py-2 hover:bg-zinc-800 w-full hover:cursor-pointer"
+                                            onClick={() => redirectToTower(tower.name, router)}
+                                        >
+                                            <img src={getTowerImageUrl(tower.name)} className="h-14 w-14 rounded-md object-cover ml-5"></img>
+                                            <span className={` text-l ${tower.diff_category === 'intense' ? 'text-outline-white' : 'text-outline'} `} style={{ color: diffColors[tower.diff_category] }}>{tower.name}</span>
+                                            <span className="text-zinc-300 text-outline-gold ml-auto mr-10 ">{profileData?.review_scores[tower.id]}</span>
                                             {profileData?.tower_reviews?.[tower.id] && (
-                                                <button
-                                                    onClick={() => {
-                                                        setSelectedReview({
-                                                            towerName: tower.name,
-                                                            review: profileData.tower_reviews[tower.id].review_text,
-                                                            summary: profileData.tower_reviews[tower.id].summary,
-                                                            score: profileData.review_scores[tower.id]
-                                                        });
-                                                    }}
-                                                    className="ml-6 w-6 h-6 mt-4 transition cursor-pointer"
-                                                >
-                                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
-                                                        <path strokeLinecap="round" strokeLinejoin="round" d="M8.625 12a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H8.25m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H12m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0h-.375M21 12c0 4.556-4.03 8.25-9 8.25a9.764 9.764 0 01-2.555-.337A5.972 5.972 0 015.41 20.97a5.969 5.969 0 01-.474-.065 4.48 4.48 0 00.978-2.025c.09-.457-.133-.901-.467-1.226C3.93 16.178 3 14.189 3 12c0-4.556 4.03-8.25 9-8.25s9 3.694 9 8.25z" />
-                                                    </svg>
-                                                </button>
+                                                <div className="relative group ml-4 w-6 h-6 mr-11">
+                                                    <button
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            setSelectedReview({
+                                                                profile: {
+                                                                    username: profileData.username || name,
+                                                                    avatar_url: profileData.avatar_url
+                                                                },
+                                                                score: profileData.review_scores[tower.id],
+                                                                summary: profileData.tower_reviews[tower.id].summary,
+                                                                review_text: profileData.tower_reviews[tower.id].review_text
+                                                            });
+                                                        }}
+                                                        className="w-6 h-6 transition cursor-pointer z-50"
+                                                    >
+                                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+                                                            <path strokeLinecap="round" strokeLinejoin="round" d="M8.625 12a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H8.25m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H12m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0h-.375M21 12c0 4.556-4.03 8.25-9 8.25a9.764 9.764 0 01-2.555-.337A5.972 5.972 0 015.41 20.97a5.969 5.969 0 01-.474-.065 4.48 4.48 0 00.978-2.025c.09-.457-.133-.901-.467-1.226C3.93 16.178 3 14.189 3 12c0-4.556 4.03-8.25 9-8.25s9 3.694 9 8.25z" />
+                                                        </svg>
+                                                    </button>
+                                                    <div className="absolute left-0 bottom-full mb-2 hidden group-hover:block bg-zinc-800 text-white text-md rounded px-3 py-2 whitespace-nowrap border border-zinc-600 z-50 pointer-events-none">
+                                                        {profileData.tower_reviews[tower.id].summary}
+                                                    </div>
+                                                </div>
                                             )}
-                                            {!profileData?.tower_reviews?.[tower.id] && <div className="ml-6 w-6 h-6 mt-4"></div>}
+                                            {!profileData?.tower_reviews?.[tower.id] && <div className="ml-4 w-6 h-6 mr-11"></div>}
 
                                         </div>
                                     ))
@@ -128,10 +150,44 @@ export default function ProfilePage({ params }: { params: Promise<{ name: string
                         <div className="mb-4">
                             <DiffOverview profileData={profileData} />
                         </div>
-                        <span className="pb-5 text-outline text-xl">Planned</span>
+                        {!!profileData?.bookmarked.count && (
+                            <div className="flex flex-col">
+                                <span className="mb-2 text-outline text-xl">Planned</span>
+
+                                <div className="flex flex-col gap-2 rounded-2xl bg-zinc-900">
+                                    {profileData?.bookmarked.towers.map((tower) => (
+                                        <div
+                                            key={tower.id}
+                                            className="flex items-center gap-4 rounded-2xl px-2 py-2  hover:bg-zinc-800 hover:cursor-pointer"
+                                            onClick={() => redirectToTower(tower.name, router)}
+                                        >
+                                            <img
+                                                className="h-14 w-14 rounded-md object-cover"
+                                                src={getTowerImageUrl(tower.name)}
+                                            />
+                                            <span
+                                                className={`${tower.diff_category === "intense" ? "text-outline-white" : "text-outline"}`}
+                                                style={{ color: diffColors[tower.diff_category] }}
+                                            >
+                                                {tower.name}
+                                            </span>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+
+
+                        )}
                     </div>
                 </div>
             </div>
+            {selectedReview && (
+                <ViewReviewModal
+                    review={selectedReview}
+                    isOwnReview={false}
+                    onClose={() => setSelectedReview(null)}
+                />
+            )}
         </div>
     )
 }

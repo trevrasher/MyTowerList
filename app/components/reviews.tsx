@@ -92,7 +92,7 @@ export default function Reviews({
                     {reviews.map((review) => (
                         <div
                             key={review.id}
-                            className="pt-4 pl-4 pr-4 border-b border-zinc-700 cursor-pointer hover:bg-zinc-800 transition"
+                            className="pt-4 pl-4 pr-4 border-b border-zinc-700 cursor-pointer hover:bg-zinc-800"
                             onClick={() => setSelectedReview(review)}
                         >
                             <div className="flex items-center justify-between mb-2">
@@ -106,7 +106,7 @@ export default function Reviews({
                                     )}
                                     <span className="text-xl font-bold text-outline">{review.profile.username}</span>
                                 </div>
-                                <span className="text-yellow-500">{review.score}/100</span>
+                                <span className="text-outline-gold">{review.score}/100</span>
                             </div>
                             {review.summary && (
                                 <div className="overflow-x-auto pb-3">

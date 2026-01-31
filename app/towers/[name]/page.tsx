@@ -263,7 +263,7 @@ export default function TowerPage({
               </span>
             </div>
             <div className="mt-6">
-              <span className="ml-18 text-white text-2xl md:text-3xl text-outline">{tower.score} / 100</span>
+              <span className="ml-18 text-2xl md:text-3xl text-outline-gold">{tower.score} / 100</span>
             </div>
             <div className="flex flex-col md:flex-row mt-8 md:mt-20">
               <Reviews

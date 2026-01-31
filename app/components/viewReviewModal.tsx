@@ -3,12 +3,12 @@ import { fetchWithAuth } from "../utils/auth";
 
 interface ViewReviewModalProps {
     onClose: () => void;
-    towerId: number;
+    towerId?: number;
     review: {
-        id: number;
+        id?: number;
         profile: {
             username: string;
-            avatar_url?: string;
+            avatar_url?: string | null;
         };
         score: number;
         summary?: string;
@@ -51,7 +51,7 @@ export default function ViewReviewModal({ onClose, review, towerId, isOwnReview 
                         )}
                         <span className="text-2xl font-bold text-outline">{review.profile.username}</span>
                     </div>
-                    <span className="text-yellow-500 text-xl font-bold">{review.score}/100</span>
+                    <span className="text-outline-gold text-xl font-bold ">{review.score}/100</span>
                 </div>
 
                 {review.summary && (
