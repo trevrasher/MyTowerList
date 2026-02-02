@@ -4,14 +4,13 @@ import { useAuth } from "@/app/hooks/useAuth";
 import { use, useEffect, useState } from "react";
 import { API_BASE_URL } from "@/next.config";
 
-import { getTowerImageUrl } from "@/app/utils/towers";
+import { getTowerImageUrl, diffColors, redirectToTower, SortState } from "@/app/utils/towers";
 import { ProfileData } from "@/app/utils/profile";
 import TotalTracker from "@/app/components/profile/totalTracker";
 import DiffOverview from "@/app/components/profile/diffOverview";
-import { diffColors } from "@/app/utils/towers";
 import ViewReviewModal from "@/app/components/viewReviewModal";
 import { useRouter } from "next/navigation";
-import { redirectToTower } from "@/app/utils/towers";
+import SortingTowerButton from "@/app/components/sortingTowerButton";
 
 
 
@@ -33,7 +32,32 @@ export default function ProfilePage({ params }: { params: Promise<{ name: string
     const [profileData, setProfileData] = useState<ProfileData | null>(null);
     const [error, setError] = useState<string | null>(null);
     const [loading, setLoading] = useState(true);
-    const [selectedReview, setSelectedReview] = useState<SelectedReview | null>(null)
+    const [selectedReview, setSelectedReview] = useState<SelectedReview | null>(null);
+    const [sortMode, setSortMode] = useState<SortState>("scoreDown");
+
+    const sortedCompleted = profileData?.completed.towers
+        ? [...profileData.completed.towers].sort((a, b) => {
+            const scoreA = profileData.review_scores[a.id];
+            const scoreB = profileData.review_scores[b.id];
+
+            if (sortMode === "scoreDown" || sortMode === "scoreUp") {
+                const hasScoreA = scoreA !== undefined;
+                const hasScoreB = scoreB !== undefined;
+
+                if (hasScoreA && !hasScoreB) return -1;
+                if (!hasScoreA && hasScoreB) return 1;
+                if (hasScoreA && hasScoreB) {
+                    return sortMode === "scoreDown" ? scoreB - scoreA : scoreA - scoreB;
+                }
+                return 0;
+            }
+
+            if (sortMode === "difficultyDown") return b.difficulty - a.difficulty;
+            if (sortMode === "difficultyUp") return a.difficulty - b.difficulty;
+
+            return 0;
+        })
+        : [];
 
     useEffect(() => {
         async function fetchProfileData() {
@@ -60,47 +84,35 @@ export default function ProfilePage({ params }: { params: Promise<{ name: string
         fetchProfileData();
     }, [name]);
 
-
     return (
         <div>
 
             <MainHeader isAuthenticated={isAuthenticated} />
             <div className="flex flex-col w-[60vw] mx-auto">
-                <div className="flex justify-start items-center pb-10">
+                <div className="flex justify-start items-center pb-7">
                     {profileData?.avatar_url && <img src={profileData?.avatar_url} className="w-24 h-24 border-2 rounded-md mr-5 "></img>}
                     <span className=" text-4xl text-outline">{name}</span>
                 </div>
                 <div className="flex">
+                    <div className="flex flex-col mx-auto -mt-3">
 
-                    <div className="flex flex-col mx-auto ">
-                        <span className="pb-5 text-outline text-3xl">Completed</span>
-                        <div className="bg-zinc-900 rounded-2xl w-[40vw] border-2">
-
-                            <div className="flex items-center gap-4 font-bold mb-3 px-2 mt-1 border-b">
-                                <span className="h-14 w-14"></span>
-                                <span className="text-zinc-300 text-xl text-outline ml-5">Name</span>
-                                <span className="text-zinc-300 text-xl text-outline ml-auto">Score</span>
-                                <span className="text-zinc-300 text-xl text-outline ml-4 mr-5">Review</span>
+                        <div className="w-[40vw] flex flex-col">
+                            <div className="flex">
+                                <span className="text-2xl text-outline my-auto">Completed</span>
+                                <div className="ml-auto mb-2">
+                                    <SortingTowerButton sortMode={sortMode} setSortMode={setSortMode} />
+                                </div>
                             </div>
-                            <div className="flex flex-col gap-2 w-full">
-                                {profileData?.completed.towers
-                                    .sort((a, b) => {
-                                        const scoreA = profileData.review_scores[a.id];
-                                        const scoreB = profileData.review_scores[b.id];
-                                        const hasScoreA = scoreA !== undefined;
-                                        const hasScoreB = scoreB !== undefined;
 
-                                        if (hasScoreA && !hasScoreB) return -1;
-                                        if (!hasScoreA && hasScoreB) return 1;
-
-
-                                        if (hasScoreA && hasScoreB) {
-                                            return scoreB - scoreA;
-                                        }
-
-                                        return 0;
-                                    })
-                                    .map((tower) => (
+                            <div className="bg-zinc-900 rounded-2xl border-2">
+                                <div className="flex items-center gap-4 font-bold mb-3 px-2 mt-1 border-b">
+                                    <span className="h-14 w-14"></span>
+                                    <span className="text-zinc-300 text-xl text-outline ml-5">Name</span>
+                                    <span className="text-zinc-300 text-xl text-outline ml-auto">Score</span>
+                                    <span className="text-zinc-300 text-xl text-outline ml-4 mr-5">Review</span>
+                                </div>
+                                <div className="flex flex-col gap-2 w-full">
+                                    {sortedCompleted.map((tower) => (
                                         <div
                                             key={tower.id}
                                             className="flex items-center gap-4 rounded-xl px-2 py-2 hover:bg-zinc-800 w-full hover:cursor-pointer"
@@ -138,8 +150,8 @@ export default function ProfilePage({ params }: { params: Promise<{ name: string
                                             {!profileData?.tower_reviews?.[tower.id] && <div className="ml-4 w-6 h-6 mr-11"></div>}
 
                                         </div>
-                                    ))
-                                }
+                                    ))}
+                                </div>
                             </div>
                         </div>
                     </div>

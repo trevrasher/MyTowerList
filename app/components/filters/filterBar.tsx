@@ -3,9 +3,9 @@ import DifficultyFilter from "./difficultyFilter";
 import AreaFilter from "./areaFilter";
 import CompletedFilter from "./completedFilter";
 import SearchBar from "./searchBar";
-import { areas } from "../utils/towers";
-import SortingTowerButton from "./sortingTowerButton";
-import { SortState } from "../utils/towers";
+import { areas } from "../../utils/towers";
+import SortingTowerButton from "../sortingTowerButton";
+import { SortState } from "../../utils/towers";
 
 
 

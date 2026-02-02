@@ -53,7 +53,7 @@ export const areaAcronyms: { [key: string]: string } = {
   "Paradise Atoll": "PA",
   "Silent Abyss": "SA",
   "The Starlit Archives": "TSA",
-  "Steelspire Horizon": "SsH"
+  "Steelspire Horizon": "SH"
 };
 
 export const diffColors: { [key: string]: string } = {
@@ -102,7 +102,7 @@ export function redirectToTower(
   router: { push: (href: string) => void }
 ) {
   const slug = encodeURIComponent(towerName);
-  router.push(`/towers/${slug}`);
+  window.open(`/towers/${slug}`, "_blank", "noopener,noreferrer");
 }
 
 export type SortState = 'scoreUp' | 'scoreDown' | 'difficultyUp' | 'difficultyDown';

@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { useEffect, useState, useRef } from "react";
 import InfiniteScroll from 'react-infinite-scroll-component';
 import AreaIcon from "./components/areaIcon";
-import FilterBar from "./components/filterBar";
+import FilterBar from "./components/filters/filterBar";
 import MainHeader from "./components/mainHeader";
 import { useAuth } from "./hooks/useAuth";
 import { fetchWithAuth } from "./utils/auth";
