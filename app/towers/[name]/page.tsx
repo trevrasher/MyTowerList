@@ -56,27 +56,26 @@ export default function TowerPage({
     if (tower) {
       try {
         await fetchWithAuth(`${API_BASE_URL}/api/towers/${tower.id}/reviews/post/`, {
-          method: 'POST',
+          method: "POST",
           headers: {
-            'Content-Type': 'application/json',
+            "Content-Type": "application/json",
           },
           body: JSON.stringify({
             score: score === "" ? 0 : score,
-            review: "",
-            summary: "",
-          })
+            review: userReview?.review_text ?? "",
+            summary: userReview?.summary ?? "",
+          }),
         });
 
         window.location.reload();
       } catch (err) {
-        setError('Failed to submit review.');
-        console.error('Review submission error:', err);
+        setError("Failed to submit review.");
+        console.error("Review submission error:", err);
       } finally {
         setIsSubmitting(false);
       }
-    };
-
-  }
+    }
+  };
 
 
   async function setStatus(status: string) {
