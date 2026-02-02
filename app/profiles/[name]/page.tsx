@@ -3,7 +3,6 @@ import MainHeader from "@/app/components/mainHeader";
 import { useAuth } from "@/app/hooks/useAuth";
 import { use, useEffect, useState } from "react";
 import { API_BASE_URL } from "@/next.config";
-
 import { getTowerImageUrl, diffColors, redirectToTower, SortState } from "@/app/utils/towers";
 import { ProfileData } from "@/app/utils/profile";
 import TotalTracker from "@/app/components/profile/totalTracker";
@@ -11,10 +10,12 @@ import DiffOverview from "@/app/components/profile/diffOverview";
 import ViewReviewModal from "@/app/components/viewReviewModal";
 import { useRouter } from "next/navigation";
 import SortingTowerButton from "@/app/components/sortingTowerButton";
+import { fetchWithAuth } from "@/app/utils/auth";
 
 
 
 interface SelectedReview {
+    towerId: number;
     profile: {
         username: string;
         avatar_url: string | null
@@ -34,6 +35,7 @@ export default function ProfilePage({ params }: { params: Promise<{ name: string
     const [loading, setLoading] = useState(true);
     const [selectedReview, setSelectedReview] = useState<SelectedReview | null>(null);
     const [sortMode, setSortMode] = useState<SortState>("scoreDown");
+    const [isOwnProfile, setIsOwnProfile] = useState(false);
 
     const sortedCompleted = profileData?.completed.towers
         ? [...profileData.completed.towers].sort((a, b) => {
@@ -58,6 +60,20 @@ export default function ProfilePage({ params }: { params: Promise<{ name: string
             return 0;
         })
         : [];
+
+
+    useEffect(() => {
+        async function fetchCurrentUser() {
+            if (!isAuthenticated || !name) return;
+            try {
+                const me = await fetchWithAuth(`${API_BASE_URL}/api/profile/`);
+                setIsOwnProfile(me.username?.toLowerCase() === name.toLowerCase());
+            } catch {
+                setIsOwnProfile(false);
+            }
+        }
+        fetchCurrentUser();
+    }, [isAuthenticated, name]);
 
     useEffect(() => {
         async function fetchProfileData() {
@@ -127,6 +143,7 @@ export default function ProfilePage({ params }: { params: Promise<{ name: string
                                                         onClick={(e) => {
                                                             e.stopPropagation();
                                                             setSelectedReview({
+                                                                towerId: tower.id,
                                                                 profile: {
                                                                     username: profileData.username || name,
                                                                     avatar_url: profileData.avatar_url
@@ -224,7 +241,8 @@ export default function ProfilePage({ params }: { params: Promise<{ name: string
             {selectedReview && (
                 <ViewReviewModal
                     review={selectedReview}
-                    isOwnReview={false}
+                    towerId={selectedReview.towerId}
+                    isOwnReview={isOwnProfile}
                     onClose={() => setSelectedReview(null)}
                 />
             )}
