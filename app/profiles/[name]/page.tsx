@@ -106,7 +106,7 @@ export default function ProfilePage({ params }: { params: Promise<{ name: string
     }, [name]);
 
     if (loading) return <div> <MainHeader isAuthenticated={isAuthenticated} /> Loading...</div>;
-    if (!profileData?.completed.count || profileData.completed.count < 1 || error) return <div> <MainHeader isAuthenticated={isAuthenticated} /> Profile not found.</div>;
+    if (!profileData?.completed.count || profileData.completed.count < 1) return <div> <MainHeader isAuthenticated={isAuthenticated} /> Profile not found.</div>;
 
     return (
         <div>
