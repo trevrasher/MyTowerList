@@ -11,6 +11,7 @@ import ViewReviewModal from "@/app/components/viewReviewModal";
 import { useRouter } from "next/navigation";
 import SortingTowerButton from "@/app/components/sortingTowerButton";
 import { fetchWithAuth } from "@/app/utils/auth";
+import { profile } from "console";
 
 
 
@@ -77,7 +78,10 @@ export default function ProfilePage({ params }: { params: Promise<{ name: string
 
     useEffect(() => {
         async function fetchProfileData() {
-            if (!name) return;
+            if (!name) {
+                setLoading(false);
+                return;
+            }
 
             try {
                 const url = `${API_BASE_URL}/api/profile/user/${name}/`;
@@ -86,6 +90,7 @@ export default function ProfilePage({ params }: { params: Promise<{ name: string
 
                 if (!res.ok) {
                     setError(data.error || 'Failed to load profile');
+
                     return;
                 }
 
@@ -100,10 +105,14 @@ export default function ProfilePage({ params }: { params: Promise<{ name: string
         fetchProfileData();
     }, [name]);
 
+    if (loading) return <div> <MainHeader isAuthenticated={isAuthenticated} /> Loading...</div>;
+    if (!profileData?.completed.count || profileData.completed.count < 1 || error) return <div> <MainHeader isAuthenticated={isAuthenticated} /> Profile not found.</div>;
+
     return (
         <div>
 
             <MainHeader isAuthenticated={isAuthenticated} />
+
             <div className="flex flex-col w-[60vw] mx-auto">
                 <div className="flex justify-start items-center pb-7">
                     {profileData?.avatar_url && <img src={profileData?.avatar_url} className="w-24 h-24 border-2 rounded-md mr-5 "></img>}
