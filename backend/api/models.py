@@ -3,6 +3,8 @@ from django.contrib.postgres.fields import ArrayField
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.contrib.auth.models import User
 import requests
+from django.utils.dateparse import parse_datetime
+from django.utils.timezone import make_aware
 
 class Area(models.Model):
     name = models.CharField(max_length=100, unique=True)
@@ -91,7 +93,7 @@ class Profile(models.Model):
         return f"{self.user.username}'s Profile"
     
     def sync_tower_completions(self):
-        completed_tower_ids = self.tower_statuses.filter(status='completed').values_list('tower_id', flat=True)
+        completed_tower_ids = self.tower_statuses.filter(status='completed', completed_at__isnull=False).values_list('tower_id', flat=True)
         uncompleted_towers = Tower.objects.exclude(id__in=completed_tower_ids).filter(badge__isnull=False)
 
         if not uncompleted_towers.exists():
@@ -99,6 +101,8 @@ class Profile(models.Model):
 
         badge_ids = list(uncompleted_towers.values_list('badge__id', flat=True))
         owned_badge_ids = []
+        awarded_dates_by_badge_id = {}
+
         for i in range(0, len(badge_ids), 100):
             batch = badge_ids[i:i+100]
             badge_ids_str = ','.join([str(bid) for bid in batch])
@@ -110,17 +114,44 @@ class Profile(models.Model):
                 )
                 response.raise_for_status()
                 data = response.json()
-                owned_badge_ids.extend([item['badgeId'] for item in data.get('data', [])])
+
+                for item in data.get('data', []):
+                    badge_id = item.get('badgeId')
+                    awarded_date = item.get('awardedDate')
+                    if badge_id is not None:
+                        owned_badge_ids.append(badge_id)
+                        if awarded_date:
+                            awarded_dates_by_badge_id[badge_id] = awarded_date
             except requests.RequestException as e:
                 return {'error': str(e)}
 
         newly_completed = uncompleted_towers.filter(badge__id__in=owned_badge_ids)
 
-        status_objects = [
-            ProfileTowerStatus(profile=self, tower=tower, status='completed')
-            for tower in newly_completed
-        ]
+        status_objects = []
+        for tower in newly_completed:
+            awarded_date_str = awarded_dates_by_badge_id.get(tower.badge_id)
+            completed_at = None
+            if awarded_date_str:
+                parsed = parse_datetime(awarded_date_str)
+                completed_at = make_aware(parsed) if parsed and parsed.tzinfo is None else parsed
+
+            status_objects.append(
+                ProfileTowerStatus(profile=self, tower=tower, status='completed', completed_at=completed_at)
+            )
+
         ProfileTowerStatus.objects.bulk_create(status_objects, ignore_conflicts=True)
+
+        for tower in newly_completed:
+            if tower.badge_id in awarded_dates_by_badge_id:
+                awarded_date_str = awarded_dates_by_badge_id[tower.badge_id]
+                parsed = parse_datetime(awarded_date_str)
+                completed_at = make_aware(parsed) if parsed and parsed.tzinfo is None else parsed
+                ProfileTowerStatus.objects.filter(
+                    profile=self,
+                    tower=tower,
+                    status='completed',
+                    completed_at__isnull=True
+                ).update(completed_at=completed_at)
 
         return {
             'newly_completed': list(newly_completed.values('id', 'name')),
@@ -166,6 +197,7 @@ class ProfileTowerStatus(models.Model):
     profile = models.ForeignKey('Profile', on_delete=models.CASCADE, related_name='tower_statuses')
     tower = models.ForeignKey('Tower', on_delete=models.CASCADE, related_name='profile_statuses')
     status = models.CharField(max_length=10, choices=STATUS_CHOICES)
+    completed_at = models.DateTimeField(null=True, blank=True)
 
     class Meta:
         unique_together = ('profile', 'tower')
