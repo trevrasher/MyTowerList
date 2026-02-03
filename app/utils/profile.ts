@@ -20,3 +20,15 @@ export interface ProfileData {
     tower_reviews: Record<number, { review_text: string; summary: string }>;
     completed_dates: Record<number, string | null>;
 }
+
+export function convertTimestamp(timestamp?: string | null): string {
+    if (!timestamp) return "";
+    const date = new Date(timestamp);
+    if (Number.isNaN(date.getTime())) return "";
+
+    const month = date.toLocaleString("en-US", { month: "short", timeZone: "UTC" });
+    const day = date.getUTCDate();
+    const year = String(date.getUTCFullYear());
+
+    return `${month} ${day} ${year}`;
+}

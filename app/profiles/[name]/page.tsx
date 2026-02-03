@@ -11,7 +11,7 @@ import ViewReviewModal from "@/app/components/viewReviewModal";
 import { useRouter } from "next/navigation";
 import SortingTowerButton from "@/app/components/sortingTowerButton";
 import { fetchWithAuth } from "@/app/utils/auth";
-import { profile } from "console";
+import { convertTimestamp } from "@/app/utils/profile";
 
 
 
@@ -130,26 +130,43 @@ export default function ProfilePage({ params }: { params: Promise<{ name: string
                             </div>
 
                             <div className="bg-zinc-900 rounded-2xl border-2">
-                                <div className="flex items-center gap-4 font-bold mb-3 px-2 mt-1 border-b">
+                                <div className="grid grid-cols-[4vw_19vw_4vw_4vw_4vw_] items-center gap-4 font-bold mb-3 px-2 mt-1 border-b">
                                     <span className="h-14 w-14"></span>
-                                    <span className="text-zinc-300 text-xl text-outline ml-5">Name</span>
-                                    <span className="text-zinc-300 text-xl text-outline ml-auto">Score</span>
-                                    <span className="text-zinc-300 text-xl text-outline">Date</span>
-                                    <span className="text-zinc-300 text-xl text-outline ml-4 mr-5">Review</span>
-                                    
+                                    <span className="text-zinc-300 text-xl text-outline">Name</span>
+                                    <span className="text-zinc-300 text-xl text-outline justify-self-center">Score</span>
+                                    <span className="text-zinc-300 text-xl text-outline justify-self-center">Date</span>
+                                    <span className="text-zinc-300 text-xl text-outline justify-self-center">Review</span>
                                 </div>
+
                                 <div className="flex flex-col gap-2 w-full">
                                     {sortedCompleted.map((tower) => (
                                         <div
                                             key={tower.id}
-                                            className="flex items-center gap-4 rounded-xl px-2 py-2 hover:bg-zinc-800 w-full hover:cursor-pointer"
+                                            className="grid grid-cols-[4vw_19vw_4vw_4vw_4vw_] items-center gap-4 rounded-xl px-2 py-2 hover:bg-zinc-800 w-full hover:cursor-pointer"
                                             onClick={() => redirectToTower(tower.name, router)}
                                         >
-                                            <img src={getTowerImageUrl(tower.name)} className="h-14 w-14 rounded-md object-cover ml-5 border-1 border-black"></img>
+                                            <img src={getTowerImageUrl(tower.name)} className="h-14 w-14 rounded-md object-cover ml-5 border-1 border-black" />
                                             <span className={` text-l ${tower.diff_category === 'intense' ? 'text-outline-white' : 'text-outline'} `} style={{ color: diffColors[tower.diff_category] }}>{tower.name}</span>
-                                            <span className="text-zinc-300 text-outline-gold ml-auto mr-10 ">{profileData?.review_scores[tower.id]}</span>
+                                            <span className="text-zinc-300 text-outline-gold justify-self-center">{profileData?.review_scores[tower.id]}</span>
+                                            <span className="text-zinc-300 justify-self-center">
+                                                <span className="relative group inline-flex items-center">
+                                                    <svg
+                                                        className="w-5 h-5 mt-1  scale-125"
+                                                        xmlns="http://www.w3.org/2000/svg"
+                                                        viewBox="0 0 24 24"
+                                                        fill="none"
+                                                        stroke="currentColor"
+                                                        strokeWidth="1.5"
+                                                    >
+                                                        <path strokeLinecap="round" strokeLinejoin="round" d="M8 7V3m8 4V3M3 9h18M5 5h14a2 2 0 012 2v12a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2z" />
+                                                    </svg>
+                                                    <span className="absolute left-1/2 -translate-x-1/2 bottom-full mb-2 hidden group-hover:block bg-zinc-800 text-white text-sm rounded px-2 py-1 whitespace-nowrap border border-zinc-600 z-50">
+                                                        {convertTimestamp(profileData?.completed_dates[tower.id])}
+                                                    </span>
+                                                </span>
+                                            </span>
                                             {profileData?.tower_reviews?.[tower.id] && (
-                                                <div className="relative group ml-4 w-6 h-6 mr-11">
+                                                <div className="relative group ml-4 w-6 h-6">
                                                     <button
                                                         onClick={(e) => {
                                                             e.stopPropagation();
@@ -175,7 +192,7 @@ export default function ProfilePage({ params }: { params: Promise<{ name: string
                                                     </div>
                                                 </div>
                                             )}
-                                            {!profileData?.tower_reviews?.[tower.id] && <div className="ml-4 w-6 h-6 mr-11"></div>}
+                                            {!profileData?.tower_reviews?.[tower.id] && <div className="ml-4 w-6 h-6"></div>}
 
                                         </div>
                                     ))}
