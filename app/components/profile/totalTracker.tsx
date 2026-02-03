@@ -37,7 +37,7 @@ export default function TotalTracker({ profileData }: TotalTrackerProps) {
                     <span className="text-m text-zinc-400">Completed Towers</span>
                 </div>
                 <div className="flex flex-col my-auto mx-auto">
-                    <span className="text-3xl text-outline mx-auto" style={{ color: hardestColor }} onMouseEnter={() => setHover(true)} onMouseLeave={() => setHover(false)}
+                    <span className="text-3xl text-outline mx-auto w-20 inline-flex justify-center items-center" style={{ color: hardestColor }} onMouseEnter={() => setHover(true)} onMouseLeave={() => setHover(false)}
                     >
                         {hover ? hardestValue : acronym}
                     </span>
