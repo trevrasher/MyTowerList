@@ -134,7 +134,9 @@ export default function ProfilePage({ params }: { params: Promise<{ name: string
                                     <span className="h-14 w-14"></span>
                                     <span className="text-zinc-300 text-xl text-outline ml-5">Name</span>
                                     <span className="text-zinc-300 text-xl text-outline ml-auto">Score</span>
+                                    <span className="text-zinc-300 text-xl text-outline">Date</span>
                                     <span className="text-zinc-300 text-xl text-outline ml-4 mr-5">Review</span>
+                                    
                                 </div>
                                 <div className="flex flex-col gap-2 w-full">
                                     {sortedCompleted.map((tower) => (

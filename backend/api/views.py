@@ -364,10 +364,12 @@ class GetFullProfile(APIView):
         completed_list = []
         bookmarked_list = []
         ignored_list = []
+        completed_dates = {}
         
         for ts in all_statuses:
             if ts.status == 'completed':
                 completed_list.append(ts.tower)
+                completed_dates[ts.tower_id] = ts.completed_at
             elif ts.status == 'bookmarked':
                 bookmarked_list.append(ts.tower)
             elif ts.status == 'ignored':
@@ -412,5 +414,6 @@ class GetFullProfile(APIView):
                 "towers": TowerSerializer(ignored_list, many=True).data
             },
             "review_scores": review_scores,
-            "tower_reviews": tower_reviews  
+            "tower_reviews": tower_reviews,
+            "completed_dates": completed_dates
         })

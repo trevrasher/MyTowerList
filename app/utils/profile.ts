@@ -18,4 +18,5 @@ export interface ProfileData {
     };
     review_scores: Record<number, number>;
     tower_reviews: Record<number, { review_text: string; summary: string }>;
+    completed_dates: Record<number, string | null>;
 }
