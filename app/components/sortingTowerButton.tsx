@@ -6,9 +6,10 @@ import { useClickOutside } from "../utils/clickOutside";
 interface SortingTowerButtonProps {
     sortMode: SortState;
     setSortMode: (value: SortState | ((prev: SortState) => SortState)) => void;
+    showDateSort?: boolean;
 }
 
-export default function SortingTowerButton({sortMode, setSortMode}: SortingTowerButtonProps) {
+export default function SortingTowerButton({sortMode, setSortMode, showDateSort = false}: SortingTowerButtonProps) {
     const [sortPopup, setSortPopup] = useState(false);
     const popupRef = useRef<HTMLDivElement>(null);
     
@@ -33,6 +34,15 @@ export default function SortingTowerButton({sortMode, setSortMode}: SortingTower
                     }}>
                         Difficulty {sortMode === 'difficultyUp' ? '↑' : sortMode === 'difficultyDown' ? '↓' : ''}
                     </button>
+                    {showDateSort && (
+                        <button className="mb-1 text-xl cursor-pointer" onClick={() => {
+                            setSortMode(prev =>
+                                prev === 'dateDown' ? 'dateUp' : 'dateDown'
+                            )
+                        }}>
+                            Date {sortMode === 'dateUp' ? '↑' : sortMode === 'dateDown' ? '↓' : ''}
+                        </button>
+                    )}
                 </div>
             }
         </div>

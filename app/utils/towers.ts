@@ -105,4 +105,10 @@ export function redirectToTower(
   window.open(`/towers/${slug}`, "_blank", "noopener,noreferrer");
 }
 
-export type SortState = 'scoreUp' | 'scoreDown' | 'difficultyUp' | 'difficultyDown';
+export type SortState =
+  | 'scoreUp'
+  | 'scoreDown'
+  | 'difficultyUp'
+  | 'difficultyDown'
+  | 'dateUp'
+  | 'dateDown';

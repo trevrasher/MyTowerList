@@ -27,6 +27,7 @@ interface SelectedReview {
 }
 
 
+
 export default function ProfilePage({ params }: { params: Promise<{ name: string }> }) {
     const router = useRouter();
     const isAuthenticated = useAuth();
@@ -38,30 +39,47 @@ export default function ProfilePage({ params }: { params: Promise<{ name: string
     const [sortMode, setSortMode] = useState<SortState>("scoreDown");
     const [isOwnProfile, setIsOwnProfile] = useState(false);
 
-    const sortedCompleted = profileData?.completed.towers
-        ? [...profileData.completed.towers].sort((a, b) => {
-            const scoreA = profileData.review_scores[a.id];
-            const scoreB = profileData.review_scores[b.id];
+const sortedCompleted = profileData?.completed.towers
+    ? [...profileData.completed.towers].sort((a, b) => {
+        const scoreA = profileData.review_scores[a.id];
+        const scoreB = profileData.review_scores[b.id];
 
-            if (sortMode === "scoreDown" || sortMode === "scoreUp") {
-                const hasScoreA = scoreA !== undefined;
-                const hasScoreB = scoreB !== undefined;
+        if (sortMode === "scoreDown" || sortMode === "scoreUp") {
+            const hasScoreA = scoreA !== undefined;
+            const hasScoreB = scoreB !== undefined;
 
-                if (hasScoreA && !hasScoreB) return -1;
-                if (!hasScoreA && hasScoreB) return 1;
-                if (hasScoreA && hasScoreB) {
-                    return sortMode === "scoreDown" ? scoreB - scoreA : scoreA - scoreB;
-                }
-                return 0;
+            if (hasScoreA && !hasScoreB) return -1;
+            if (!hasScoreA && hasScoreB) return 1;
+            if (hasScoreA && hasScoreB) {
+                return sortMode === "scoreDown" ? scoreB - scoreA : scoreA - scoreB;
             }
-
-            if (sortMode === "difficultyDown") return b.difficulty - a.difficulty;
-            if (sortMode === "difficultyUp") return a.difficulty - b.difficulty;
-
             return 0;
-        })
-        : [];
+        }
 
+        if (sortMode === "dateDown" || sortMode === "dateUp") {
+            const rawA = profileData.completed_dates?.[a.id];
+            const rawB = profileData.completed_dates?.[b.id];
+
+            const timeA = rawA ? Date.parse(rawA) : NaN;
+            const timeB = rawB ? Date.parse(rawB) : NaN;
+
+            const hasA = !Number.isNaN(timeA);
+            const hasB = !Number.isNaN(timeB);
+
+            if (hasA && !hasB) return -1;
+            if (!hasA && hasB) return 1;
+            if (hasA && hasB) {
+                return sortMode === "dateDown" ? timeB - timeA : timeA - timeB;
+            }
+            return 0;
+        }
+
+        if (sortMode === "difficultyDown") return b.difficulty - a.difficulty;
+        if (sortMode === "difficultyUp") return a.difficulty - b.difficulty;
+
+        return 0;
+    })
+    : [];
 
     useEffect(() => {
         async function fetchCurrentUser() {
@@ -125,7 +143,7 @@ export default function ProfilePage({ params }: { params: Promise<{ name: string
                             <div className="flex">
                                 <span className="text-2xl text-outline my-auto">Completed</span>
                                 <div className="ml-auto mb-2">
-                                    <SortingTowerButton sortMode={sortMode} setSortMode={setSortMode} />
+                                    <SortingTowerButton sortMode={sortMode} setSortMode={setSortMode} showDateSort />
                                 </div>
                             </div>
 
