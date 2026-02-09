@@ -127,7 +127,6 @@ class Profile(models.Model):
 
         newly_completed = uncompleted_towers.filter(badge__id__in=owned_badge_ids)
 
-        status_objects = []
         for tower in newly_completed:
             awarded_date_str = awarded_dates_by_badge_id.get(tower.badge_id)
             completed_at = None
@@ -135,23 +134,15 @@ class Profile(models.Model):
                 parsed = parse_datetime(awarded_date_str)
                 completed_at = make_aware(parsed) if parsed and parsed.tzinfo is None else parsed
 
-            status_objects.append(
-                ProfileTowerStatus(profile=self, tower=tower, status='completed', completed_at=completed_at)
+            defaults = {'status': 'completed'}
+            if completed_at is not None:
+                defaults['completed_at'] = completed_at
+
+            ProfileTowerStatus.objects.update_or_create(
+                profile=self,
+                tower=tower,
+                defaults=defaults
             )
-
-        ProfileTowerStatus.objects.bulk_create(status_objects, ignore_conflicts=True)
-
-        for tower in newly_completed:
-            if tower.badge_id in awarded_dates_by_badge_id:
-                awarded_date_str = awarded_dates_by_badge_id[tower.badge_id]
-                parsed = parse_datetime(awarded_date_str)
-                completed_at = make_aware(parsed) if parsed and parsed.tzinfo is None else parsed
-                ProfileTowerStatus.objects.filter(
-                    profile=self,
-                    tower=tower,
-                    status='completed',
-                    completed_at__isnull=True
-                ).update(completed_at=completed_at)
 
         return {
             'newly_completed': list(newly_completed.values('id', 'name')),
@@ -203,4 +194,4 @@ class ProfileTowerStatus(models.Model):
         unique_together = ('profile', 'tower')
 
 
-        
+
