@@ -24,6 +24,8 @@ const sortToOrdering = (sortMode: SortState): string => {
     'scoreDown': '-score',
     'difficultyUp': 'difficulty',
     'difficultyDown': '-difficulty',
+    'dateUp': 'date',
+    'dateDown': '-date',
   };
   return mapping[sortMode];
 };
