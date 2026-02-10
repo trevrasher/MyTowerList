@@ -55,7 +55,9 @@ class TowerListView(generics.ListAPIView):
             'difficulty': 'difficulty',
             '-difficulty': '-difficulty',
             'score': 'score',
-            '-score': '-score'
+            '-score': '-score',
+            'date': 'id',
+            '-date': '-id',
         }
         
         if ordering in valid_orderings and not isinstance(queryset, list):
