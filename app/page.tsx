@@ -10,6 +10,7 @@ import { useAuth } from "./hooks/useAuth";
 import { fetchWithAuth } from "./utils/auth";
 import { Tower, areas, diffColors, getTowerDifficultyWord, getTowerImageUrl } from "./utils/towers";
 import { SortState } from "./utils/towers";
+import { buildQueryParams, sortToOrdering } from "./utils/queryBuilder";
 
 
 
@@ -17,52 +18,6 @@ interface TowerStatus {
   tower_id: number;
   status: string;
 }
-
-const sortToOrdering = (sortMode: SortState): string => {
-  const mapping: Record<SortState, string> = {
-    'scoreUp': 'score',
-    'scoreDown': '-score',
-    'difficultyUp': 'difficulty',
-    'difficultyDown': '-difficulty',
-    'dateUp': 'date',
-    'dateDown': '-date',
-  };
-  return mapping[sortMode];
-};
-
-function buildQueryParams(
-  selectedAreas: string[],
-  difficultyRange: number[],
-  completedToggle: boolean,
-  towerStatuses: Map<number, string>,
-  sortMode: SortState
-) {
-  const params = new URLSearchParams();
-  if (selectedAreas.length && selectedAreas.length !== areas.length) {
-    selectedAreas.forEach(area => params.append("area", area));
-  }
-  params.append("difficulty_min", difficultyRange[0].toString());
-  params.append("difficulty_max", difficultyRange[1].toString());
-  if (completedToggle && towerStatuses.size) {
-    params.append("exclude_completed", "true");
-    towerStatuses.forEach((status, id) => {
-      if (status === 'completed') {
-        params.append("completed_ids", id.toString());
-      }
-    });
-  } 
-  towerStatuses.forEach((status, id) => {
-    if (status === 'ignored') {
-      params.append("ignored_ids", id.toString());
-    }
-  });
-  
-  if (sortMode) {
-    params.append("ordering", sortToOrdering(sortMode));
-  }
-  return `${API_BASE_URL}/api/towers/?${params.toString()}`;
-}
-
 
 export default function Home() {
   const [towers, setTowers] = useState<Tower[]>([]);
@@ -107,7 +62,7 @@ export default function Home() {
   useEffect(() => {
     if (!completedTowersLoaded) return;
     setTowers([]);
-    let url = buildQueryParams(selectedAreas, difficultyRange, completedToggle, towerStatuses, sortMode);
+    let url = buildQueryParams(selectedAreas, areas, difficultyRange, completedToggle, towerStatuses, sortMode);
     if (searchQuery) {
       url += `&search=${encodeURIComponent(searchQuery)}`;
     }

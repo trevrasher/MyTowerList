@@ -11,7 +11,7 @@ import ViewReviewModal from "@/app/components/viewReviewModal";
 import { useRouter } from "next/navigation";
 import SortingTowerButton from "@/app/components/sortingTowerButton";
 import { fetchWithAuth } from "@/app/utils/auth";
-import { convertTimestamp } from "@/app/utils/profile";
+import { convertTimestamp, sortCompletedTowers } from "@/app/utils/profile";
 
 
 
@@ -39,47 +39,14 @@ export default function ProfilePage({ params }: { params: Promise<{ name: string
     const [sortMode, setSortMode] = useState<SortState>("scoreDown");
     const [isOwnProfile, setIsOwnProfile] = useState(false);
 
-const sortedCompleted = profileData?.completed.towers
-    ? [...profileData.completed.towers].sort((a, b) => {
-        const scoreA = profileData.review_scores[a.id];
-        const scoreB = profileData.review_scores[b.id];
+    
 
-        if (sortMode === "scoreDown" || sortMode === "scoreUp") {
-            const hasScoreA = scoreA !== undefined;
-            const hasScoreB = scoreB !== undefined;
-
-            if (hasScoreA && !hasScoreB) return -1;
-            if (!hasScoreA && hasScoreB) return 1;
-            if (hasScoreA && hasScoreB) {
-                return sortMode === "scoreDown" ? scoreB - scoreA : scoreA - scoreB;
-            }
-            return 0;
-        }
-
-        if (sortMode === "dateDown" || sortMode === "dateUp") {
-            const rawA = profileData.completed_dates?.[a.id];
-            const rawB = profileData.completed_dates?.[b.id];
-
-            const timeA = rawA ? Date.parse(rawA) : NaN;
-            const timeB = rawB ? Date.parse(rawB) : NaN;
-
-            const hasA = !Number.isNaN(timeA);
-            const hasB = !Number.isNaN(timeB);
-
-            if (hasA && !hasB) return -1;
-            if (!hasA && hasB) return 1;
-            if (hasA && hasB) {
-                return sortMode === "dateDown" ? timeB - timeA : timeA - timeB;
-            }
-            return 0;
-        }
-
-        if (sortMode === "difficultyDown") return b.difficulty - a.difficulty;
-        if (sortMode === "difficultyUp") return a.difficulty - b.difficulty;
-
-        return 0;
-    })
-    : [];
+    const sortedCompleted = profileData ? sortCompletedTowers(
+    profileData.completed.towers,
+    sortMode,
+    profileData.review_scores,
+    profileData.completed_dates
+    ) : [];
 
     useEffect(() => {
         async function fetchCurrentUser() {

@@ -1,24 +1,8 @@
-import { ProfileData } from "@/app/utils/profile"
+import { ProfileData, getDiffCategoryCounts } from "@/app/utils/profile"
 import { diffColors } from "@/app/utils/towers";
 
 interface DiffOverviewProps {
     profileData: ProfileData | null
-}
-
-function getDiffCategoryCounts(towers: ProfileData['completed']['towers']) {
-    const counts: Record<string, number> = {};
-    const percentages: Record<string, number> = {};
-    const total = towers.length;
-
-    towers.forEach(tower => {
-        counts[tower.diff_category] = (counts[tower.diff_category] || 0) + 1;
-    });
-
-    Object.entries(counts).forEach(([category, count]) => {
-        percentages[category] = total > 0 ? (count / total) * 100 : 0;
-    });
-
-    return percentages;
 }
 
 export default function DiffOverview({ profileData }: DiffOverviewProps) {

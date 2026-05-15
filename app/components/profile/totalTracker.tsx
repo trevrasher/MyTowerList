@@ -1,16 +1,9 @@
-import { ProfileData } from "@/app/utils/profile";
+import { ProfileData, getTowerAcronym } from "@/app/utils/profile";
 import { diffColors } from "@/app/utils/towers";
 import { useState } from "react";
 
 interface TotalTrackerProps {
     profileData: ProfileData | null
-}
-
-function getTowerAcronym(towerName: string): string {
-    return towerName
-        .split(' ')
-        .map(word => word[0])
-        .join('')
 }
 
 

@@ -18,8 +18,6 @@ interface ViewReviewModalProps {
 }
 
 
-
-
 export default function ViewReviewModal({ onClose, review, towerId, isOwnReview }: ViewReviewModalProps) {
     async function handleDelete() {
         if (!confirm('Are you sure you want to delete this review?')) return;
