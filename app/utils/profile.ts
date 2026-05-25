@@ -1,5 +1,8 @@
 import { Tower } from "./towers";
 import { SortState } from "@/app/utils/towers";
+import { fetchWithAuth } from "./auth";
+import { API_BASE_URL } from "@/next.config";
+
 
 export interface ProfileData {
     roblox_user_id: number | null;
@@ -21,6 +24,28 @@ export interface ProfileData {
     tower_reviews: Record<number, { review_text: string; summary: string }>;
     completed_dates: Record<number, string | null>;
 }
+
+export async function fetchCurrentUser(): Promise<{ username: string }> {
+    const me = await fetchWithAuth(`${API_BASE_URL}/api/profile/`);
+    return me;
+}
+
+export async function fetchProfileDataForUser(name: string): Promise<ProfileData> {
+    const url = `${API_BASE_URL}/api/profile/user/${name}/`;
+    const res = await fetch(url);
+    const data = await res.json();
+
+    if (!res.ok) {
+        throw new Error(data.error || 'Failed to load profile');
+    }
+
+    return data;
+}
+
+export function isOwnProfile(currentUsername: string | undefined, profileName: string): boolean {
+    return currentUsername?.toLowerCase() === profileName.toLowerCase();
+}
+
 
 export function getDiffCategoryCounts(towers: ProfileData['completed']['towers']) {
     const counts: Record<string, number> = {};

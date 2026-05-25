@@ -11,7 +11,8 @@ import ViewReviewModal from "@/app/components/viewReviewModal";
 import { useRouter } from "next/navigation";
 import SortingTowerButton from "@/app/components/sortingTowerButton";
 import { fetchWithAuth } from "@/app/utils/auth";
-import { convertTimestamp, sortCompletedTowers } from "@/app/utils/profile";
+import { fetchCurrentUser, fetchProfileDataForUser, isOwnProfile as checkIsOwnProfile, convertTimestamp, sortCompletedTowers } from "@/app/utils/profile";
+
 
 
 
@@ -49,45 +50,38 @@ export default function ProfilePage({ params }: { params: Promise<{ name: string
     ) : [];
 
     useEffect(() => {
-        async function fetchCurrentUser() {
+        async function checkOwnProfile() {
             if (!isAuthenticated || !name) return;
             try {
-                const me = await fetchWithAuth(`${API_BASE_URL}/api/profile/`);
-                setIsOwnProfile(me.username?.toLowerCase() === name.toLowerCase());
+                const me = await fetchCurrentUser();
+                setIsOwnProfile(checkIsOwnProfile(me.username, name));
             } catch {
                 setIsOwnProfile(false);
             }
         }
-        fetchCurrentUser();
+        checkOwnProfile();
     }, [isAuthenticated, name]);
 
     useEffect(() => {
-        async function fetchProfileData() {
+        async function loadProfileData() {
             if (!name) {
                 setLoading(false);
                 return;
             }
 
             try {
-                const url = `${API_BASE_URL}/api/profile/user/${name}/`;
-                const res = await fetch(url);
-                const data = await res.json();
-
-                if (!res.ok) {
-                    setError(data.error || 'Failed to load profile');
-
-                    return;
-                }
-
+                const data = await fetchProfileDataForUser(name);
                 setProfileData(data);
+                setError(null);
             } catch (err) {
-                setError('Failed to load profile');
+                const errorMsg = err instanceof Error ? err.message : 'Failed to load profile';
+                setError(errorMsg);
             } finally {
                 setLoading(false);
             }
         }
 
-        fetchProfileData();
+        loadProfileData();
     }, [name]);
 
     if (loading) return <div> <MainHeader isAuthenticated={isAuthenticated} /> Loading...</div>;
